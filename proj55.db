@@ -30,8 +30,8 @@ create table camara
    constraint pk_camara_num_camara primary key(numCamara));
 
 create table video
-    (dataHoraInicio 	timestamp	not null unique,
-    dataHoraFim   timestamp  not null,
+    (dataHoraInicio 	date	not null unique,
+    dataHoraFim   date  not null,
     numCamara   integer not null unique,
     constraint pk_video_data_hora_inicio primary key(dataHoraInicio),
     constraint fk_video_num_camara foreign key(numCamara) references camara(numCamara));
@@ -39,7 +39,7 @@ create table video
 create table segmentoVideo
      (numSegmento 	integer	not null unique,
      duracao   interval  not null, /*OU TIMESTAMP????*/
-     dataHoraInicio   timestamp  not null unique,
+     dataHoraInicio   date  not null unique,
      numCamara   integer not null unique,
      constraint pk_segmento_video_numSegmento primary key(numSegmento),
      constraint fk_segmento_video_data_hora_inicio foreign key(dataHoraInicio) references video(dataHoraInicio),
@@ -55,11 +55,11 @@ create table vigia
      constraint fk_vigia_morada_local foreign key(moradaLocal) references local(moradaLocal),
      constraint fk_vigia_num_camara foreign key(numCamara) references camara(numCamara));
 
-create table processoSocorro
-   /*RI: todo o processo de socorro esta associado a um ou mais eventoEmergencia*/
-  (numProcessoSocorro	integer	unique,
-   constraint pk_processo_socorro_num primary key(numProcessoSocorro));
-
+     create table processoSocorro
+           /*RI: todo o processo de socorro esta associado a um ou mais eventoEmergencia*/
+          (numProcessoSocorro	integer	unique,
+           constraint pk_processo_socorro_num primary key(numProcessoSocorro));
+           
 create table eventoEmergencia
       (numTelefone 	varchar(15)	not null unique,
       instanteChamada  timestamp not null, /*POSTGRES NAO TEM timestamp*/
@@ -136,8 +136,8 @@ create table audita
       numMeio	  integer	not null unique,
       nomeEntidade  varchar(200)	not null unique,
       numProcessoSocorro  integer unique,
-      datahoraInicio    timestamp	not null, /*RI: datahoraInicio < datahoraFim*/
-      datahoraFim   timestamp	not null,
+      datahoraInicio    date	not null, /*RI: datahoraInicio < datahoraFim*/
+      datahoraFim   date	not null,
       dataAuditoria   date	not null, /*RI: dataAuditoria >= dataAtual*/
       texto text ,
       constraint fk_audita_id_coordenador foreign key(idCoordenador) references coordenador(idCoordenador),
@@ -147,10 +147,10 @@ create table audita
 
 create table solicita
      (idCoordenador	  integer	not null unique,
-      dataHoraInicioVideo    timestamp	not null unique,
+      dataHoraInicioVideo    date	not null unique,
       numCamara   integer not null unique,
-      dataHoraInicio   timestamp	not null,
-      dataHoraFim   timestamp	not null,
+      dataHoraInicio   date	not null,
+      dataHoraFim   date	not null,
       constraint fk_solicita_id_coordenador foreign key(idCoordenador) references coordenador(idCoordenador),
       constraint fk_solicita_data_hora_inicio foreign key(dataHoraInicio) references video(dataHoraInicio),
       constraint fk_solicita_num_camara foreign key(numCamara) references video(numCamara));
