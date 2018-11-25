@@ -1,70 +1,292 @@
 ----------------------------------------
+-- Auxiliary Functions
+----------------------------------------
+/*increments given number by one*/
+Create or replace function incrementingInt(num int) returns int as
+$$
+begin
+  return (num + 1);
+end;
+$$ language plpgsql;
+
+/*returns random integer between a and b*/
+Create or replace function randomIntegerBetween(a int, b int) returns int as
+$$
+begin
+  return floor(random() * (b - a + 1)) + a;
+end;
+$$ language plpgsql;
+
+/*returns random integer between a and b*/
+/*Create or replace function generateTimeStamps() returns timestamp[] as
+$$
+declare
+  times timestamp[];
+begin
+  times = generate_series(
+       (date '2018-01-01')::timestamp,
+       (date '2018-12-31')::timestamp,
+       interval '1 day');
+  raise notice 'Value: %', times[0];
+
+    return (times);
+end;
+$$ language plpgsql;*/
+
+Create or replace function random_numeric_string(length integer) returns text as
+$$
+declare
+  chars text[] := '{1,2,3,4,5,6,7,8,9}';
+  result text := '';
+  i integer := 0;
+begin
+  if length < 0 then
+    raise exception 'Given length cannot be less than 0';
+  end if;
+  for i in 1..length loop
+    result := result || chars[1+random()*(array_length(chars, 1)-1)];
+  end loop;
+  return result;
+end;
+$$ language plpgsql;
+
+Create or replace function random_morada_local() returns text as
+$$
+declare
+  locals text[] := '{Abrantes,Agueda,Alandroal,Albergaria-a-Velha,Albufeira,Alcanena,
+      Alcobaça,Alcochete,Alenquer,Alcoutim,Aljezur,Aljustrel,Almada,Almeida,Almeirim,
+      Almodovar,Alpiarça,Amadora,Alvaiazere,Alvito,Arouca,Aveiro,Amarante,
+      Amares,Anadia,Angra do Heroismo,Arcos de Valdevez,Arganil,Arraiolos,
+      Avis,Arruda dos Vinhos,Azambuja,Barcelos,Barrancos,Barreiro,Batalha,Beja,
+      Bombarral,Braga,Braganca,Benavente,Borba,Boticas,Cadaval,Castelo Branco,
+      Chamusca,Chaves,Coimbra,Campo Maior,Cantanhede,Carregal do Sal,Cartaxo,
+      Cascais,Castanheira de Pera,Castelo de Paiva,Castelo de Vide,Castro Daire,Coruche,Elvas,Entroncamento,
+      Espinho,Esposende,Estarreja,Estremoz,Evora,Faro,Funchal,Gondomar,Gouveia,Guarda,
+      Lagos,Leiria,Lisboa,Loures,Lousada,Mafra,Mangualde,Matosinhos,Moita,
+      Monchique,Montijo,Nisa,Odemira,Odivelas,Oeiras,Oliveira do Hospital,Ourique,
+      Penacova,Penafiel,Peniche,Pombal,Porto,Sabrosa,Sabugal,Santana,Serpa,
+      Tavira,Tomar,Tondela,Viseu}';
+  i integer := randomIntegerBetween(0,99);
+begin
+  return text[i];
+end;
+$$ language plpgsql;
+
+----------------------------------------
 -- Populate Relations
 ----------------------------------------
-
 /*camara*/
-insert into camara values (1);
-insert into camara values (2);
-insert into camara values (3);
-insert into camara values (4);
+CREATE OR REPLACE FUNCTION populate_camara()
+RETURNS void AS
+$$
+DECLARE n integer := 0; /*numCamara*/
+        i integer := 0;
+BEGIN
+/*loops until 100 camaras in table*/
+FOR i IN 1..100
+LOOP
+    n := incrementingInt(n::int);
+    INSERT INTO camara
+    VALUES(n);
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*video*/
-/*insert into video values ('Adams',	'Main Street',	'Lisbon');
-insert into video values ('Brown',	'Main Street',	'Oporto');
-insert into video values ('Cook',	'Main Street',	'Lisbon');
-insert into video values ('Davis',	'Church Street','Oporto');*/
+CREATE OR REPLACE FUNCTION populate_video()
+RETURNS void AS
+$$
+DECLARE day integer;
+        month integer;
+        dHI timestamp; /*dataHoraInicio*/
+        dHF timestamp; /*dataHoraFim*/
+        n integer; /*numCamara*/
+        i integer := 0,
+        times timestamp[] := generateTimeStamps();
+BEGIN
+raise notice 'Value: %', times[0];
+
+FOR i IN 1..100
+LOOP
+
+    dHI := times[i];
+    dHF := times[i + 1];
+    n := randomIntegerBetween(1, 100);
+
+    INSERT INTO video
+    VALUES(dHI::timestamp, dHF, n);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*segmentoVideo*/
-/*insert into segmentoVideo values ('Downtown',	'Lisbon',		1900000);
-insert into segmentoVideo values ('Central',	'Cascais',		2100000);
-insert into segmentoVideo values ('Uptown',	'Amadora',		1700000);
-insert into segmentoVideo values ('Metro',	'Amadora',	 	400200);*/
+
 
 /*local*/
-/*insert into local values ('A-101',	'Downtown',	500);
-insert into local values ('A-215',	'Metro',	600);
-insert into local values ('A-102',	'Uptown',	700);
-insert into local values ('A-305',	'Round Hill',	800);*/
+CREATE OR REPLACE FUNCTION populate_local()
+RETURNS void AS
+$$
+DECLARE i integer := 0;
+        locals text[] := '{Abrantes,Agueda,Alandroal,Albergaria-a-Velha,Albufeira,Alcanena,
+            Alcobaça,Alcochete,Alenquer,Alcoutim,Aljezur,Aljustrel,Almada,Almeida,Almeirim,
+            Almodovar,Alpiarça,Amadora,Alvaiazere,Alvito,Arouca,Aveiro,Amarante,
+            Amares,Anadia,Angra do Heroismo,Arcos de Valdevez,Arganil,Arraiolos,
+            Avis,Arruda dos Vinhos,Azambuja,Barcelos,Barrancos,Barreiro,Batalha,Beja,
+            Bombarral,Braga,Braganca,Benavente,Borba,Boticas,Cadaval,Castelo Branco,
+            Chamusca,Chaves,Coimbra,Campo Maior,Cantanhede,Carregal do Sal,Cartaxo,
+            Cascais,Castanheira de Pera,Castelo de Paiva,Castelo de Vide,Castro Daire,Coruche,Elvas,Entroncamento,
+            Espinho,Esposende,Estarreja,Estremoz,Evora,Faro,Funchal,Gondomar,Gouveia,Guarda,
+            Lagos,Leiria,Lisboa,Loures,Lousada,Mafra,Mangualde,Matosinhos,Moita,
+            Monchique,Montijo,Nisa,Odemira,Odivelas,Oeiras,Oliveira do Hospital,Ourique,
+            Penacova,Penafiel,Peniche,Pombal,Porto,Sabrosa,Sabugal,Santana,Serpa,
+            Tavira,Tomar,Tondela,Viseu}';
+
+BEGIN
+/*loops until 100 local in table*/
+FOR i IN 1..array_length(locals,1)
+LOOP
+    INSERT INTO local
+    VALUES(locals[i]); /*moradaLocal*/
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*vigia*/
-/*insert into vigia values ('Johnson', 'A-101');
-insert into vigia values ('Brown',	 'A-215');
-insert into vigia values ('Cook',	 'A-102');
-insert into vigia values ('Cook',	 'A-101');*/
+CREATE OR REPLACE FUNCTION populate_vigia()
+RETURNS void AS
+$$
+DECLARE m varchar(255); /*moradaLocal*/
+        n integer; /*numCamara*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
 
-/*eventoEmergencia*/
-/*insert into eventoEmergencia values ('L-17', 'Downtown',	1000);
-insert into eventoEmergencia values ('L-23', 'Central',	2000);
-insert into eventoEmergencia values ('L-15', 'Uptown',	3000);
-insert into eventoEmergencia values ('L-14', 'Downtown',	4000);*/
+    m := ;
+    n := randomIntegerBetween(1, 100);
+
+    INSERT INTO vigia
+    VALUES(m, n);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*processoSocorro*/
-/*insert into processoSocorro values ('Iacocca',	'L-17');
-insert into processoSocorro values ('Brown',	'L-23');
-insert into processoSocorro values ('Cook',	'L-15');
-insert into processoSocorro values ('Nguyen',	'L-14');
-insert into processoSocorro values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_processo_socorro()
+RETURNS void AS
+$$
+DECLARE n integer; /*numProcessoSocorro*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    n := randomIntegerBetween(1, 100);
+
+    INSERT INTO processoSocorro
+    VALUES(n);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+/*eventoEmergencia*/
+CREATE OR REPLACE FUNCTION populate_evento_emergencia()
+RETURNS void AS
+$$
+DECLARE numT varchar(15); /*numTelefone*/
+        iC timestamp; /*instanteChamada*/
+        nP varchar(80); /*nomePessoa*/
+        mL varchar (255); /*moradaLocal*/
+        numP integer; /*numProcessoSocorro*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    numT := random_numeric_string(9);
+    iC :=;
+    nP :=;
+    mL :=;
+    numP :=;
+
+    INSERT INTO eventoEmergencia
+    VALUES(numT, iC, nP, mL, numP);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*entidadeMeio*/
-/*insert into entidadeMeio values ('Iacocca',	'L-17');
-insert into entidadeMeio values ('Brown',	'L-23');
-insert into entidadeMeio values ('Cook',	'L-15');
-insert into entidadeMeio values ('Nguyen',	'L-14');
-insert into entidadeMeio values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_entidade_meio()
+RETURNS void AS
+$$
+DECLARE nM varchar(80); /*nomeMeio*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    nM := random_numeric_string(9);
+
+    INSERT INTO entidadeMeio
+    VALUES(nM);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*meio*/
-/*insert into meio values ('Iacocca',	'L-17');
-insert into meio values ('Brown',	'L-23');
-insert into meio values ('Cook',	'L-15');
-insert into meio values ('Nguyen',	'L-14');
-insert into meio values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_meio()
+RETURNS void AS
+$$
+DECLARE numM integer; /*numMeio*/
+        nM varchar(80); /*nomeMeio*/
+        nE varchar(200); /*nomeEntidade*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    numM := randomIntegerBetween(1, 100);
+    nM := random_numeric_string(80);
+    nE := random_numeric_string(200);
+
+    INSERT INTO meio
+    VALUES(numM, nM, nE);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*meioCombate*/
-/*insert into meioCombate values ('Iacocca',	'L-17');
-insert into meioCombate values ('Brown',	'L-23');
-insert into meioCombate values ('Cook',	'L-15');
-insert into meioCombate values ('Nguyen',	'L-14');
-insert into meioCombate values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_meio_combate()
+RETURNS void AS
+$$
+DECLARE numM integer; /*numMeio*/
+        nE varchar(200); /*nomeEntidade*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    numM := randomIntegerBetween(1, 100);
+    nE := random_numeric_string(200);
+
+    INSERT INTO meioCombate
+    VALUES(numM, nE);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*meioApoio*/
 /*insert into meioApoio values ('Iacocca',	'L-17');
@@ -81,43 +303,180 @@ insert into meioSocorro values ('Nguyen',	'L-14');
 insert into meioSocorro values ('Davis',	'L-93');*/
 
 /*transporta*/
-/*insert into transporta values ('Iacocca',	'L-17');
-insert into transporta values ('Brown',	'L-23');
-insert into transporta values ('Cook',	'L-15');
-insert into transporta values ('Nguyen',	'L-14');
-insert into transporta values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_transporta()
+RETURNS void AS
+$$
+DECLARE numM integer; /*numMeio*/
+        nE varchar(200); /*nomeMeio*/
+        numV integer; /*numVitimas*/
+        numP integer; /*numProcessoSocorro*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    numM := randomIntegerBetween(1, 100);
+    nE := random_numeric_string(200);
+    numV := randomIntegerBetween(0, 1000);
+    numP := randomIntegerBetween(1, 100);
+
+    INSERT INTO transporta
+    VALUES(numM, nE, numV, numP);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*alocado*/
-/*insert into alocado values ('Iacocca',	'L-17');
-insert into alocado values ('Brown',	'L-23');
-insert into alocado values ('Cook',	'L-15');
-insert into alocado values ('Nguyen',	'L-14');
-insert into alocado values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_alocado()
+RETURNS void AS
+$$
+DECLARE numM integer; /*numMeio*/
+        nE varchar(200); /*nomeMeio*/
+        numH integer; /*numHoras*/
+        numP integer; /*numProcessoSocorro*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    numM := randomIntegerBetween(1, 100);
+    nE := random_numeric_string(200);
+    numH := randomIntegerBetween(0, 50);
+    numP := randomIntegerBetween(1, 100);
+
+    INSERT INTO alocado
+    VALUES(numM, nE, numH, numP);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*acciona*/
-/*insert into acciona values ('Iacocca',	'L-17');
-insert into acciona values ('Brown',	'L-23');
-insert into acciona values ('Cook',	'L-15');
-insert into acciona values ('Nguyen',	'L-14');
-insert into acciona values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_acciona()
+RETURNS void AS
+$$
+DECLARE numM integer; /*numMeio*/
+        nE varchar(200); /*nomeMeio*/
+        numP integer; /*numProcessoSocorro*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    numM := randomIntegerBetween(1, 100);
+    nE := random_numeric_string(200);
+    numP := randomIntegerBetween(1, 100);
+
+    INSERT INTO acciona
+    VALUES(numM, nE, numV, numP);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*coordenador*/
-/*insert into coordenador values ('Iacocca',	'L-17');
-insert into coordenador values ('Brown',	'L-23');
-insert into coordenador values ('Cook',	'L-15');
-insert into coordenador values ('Nguyen',	'L-14');
-insert into coordenador values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_coordenador()
+RETURNS void AS
+$$
+DECLARE iC integer; /*idCoordenador*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    iC := randomIntegerBetween(1, 100);
+
+    INSERT INTO coordenador
+    VALUES(iC);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*audita*/
-/*insert into audita values ('Iacocca',	'L-17');
-insert into audita values ('Brown',	'L-23');
-insert into audita values ('Cook',	'L-15');
-insert into audita values ('Nguyen',	'L-14');
-insert into audita values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_audita()
+RETURNS void AS
+$$
+DECLARE iC integer; /*idCoordenador*/
+        numM integer; /*numMeio*/
+        nE varchar(200); /*nomeMeio*/
+        numP integer; /*numProcessoSocorro*/
+        dhI timestamp; /*datahoraInicio*/
+        dhF timestamp; /*datahoraFim*/
+        dA date; /*dataAuditoria*/
+        t text; /*texto*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    iC := randomIntegerBetween(1, 100);
+    numM := randomIntegerBetween(1, 100);
+    nE := random_numeric_string(200);
+    numP := randomIntegerBetween(1, 100);
+    dhI := ;
+    dhF := ;
+    dA := ;
+    t = random_numeric_string(100);
+
+    INSERT INTO audita
+    VALUES(iC, numM, nE, numP, dhI, dhF, dA, t);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*solicita*/
-/*insert into solicita values ('Iacocca',	'L-17');
-insert into solicita values ('Brown',	'L-23');
-insert into solicita values ('Cook',	'L-15');
-insert into solicita values ('Nguyen',	'L-14');
-insert into solicita values ('Davis',	'L-93');*/
+CREATE OR REPLACE FUNCTION populate_solicita()
+RETURNS void AS
+$$
+DECLARE iC integer; /*idCoordenador*/
+        dHIV timestamp; /*dataHoraInicioVideo*/
+        numC integer; /*numCamara*/
+        dHI timestamp; /*dataHoraInicio*/
+        dHF timestamp; /*dataHoraFim*/
+        i integer := 0,
+BEGIN
+/*loops 100*/
+FOR i IN 1..100
+LOOP
+
+    iC := randomIntegerBetween(1, 100);
+    dHIV := ;
+    numC := randomIntegerBetween(1, 100);
+    dHI := ;
+    dHF := ;
+
+    INSERT INTO solicita
+    VALUES(iC, dHIV, numC, dHI, dHF);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$ BEGIN
+    PERFORM populate_camara();
+    PERFORM populate_video();
+    /*PERFORM populate_segmento_video();*/
+    PERFORM populate_local();
+    /*PERFORM populate_vigia();
+    PERFORM populate_evento_emergencia();
+    PERFORM populate_processo_socorro();
+    PERFORM populate_entidade_meio();
+    PERFORM populate_meio();
+    PERFORM populate_meio_combate();
+    PERFORM populate_meio_apoio();
+    PERFORM populate_meio_socorro();
+    PERFORM populate_transporta();
+    PERFORM populate_alocado();
+    PERFORM populate_acciona();
+    PERFORM populate_coordenador();
+    PERFORM populate_audita();
+    PERFORM populate_solicita();*/
+END $$;
