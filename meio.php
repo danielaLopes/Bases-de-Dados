@@ -37,7 +37,7 @@
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomemeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
-                  echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover Meio</a></td>\n");
+                  echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
               echo("</table>\n");
@@ -62,7 +62,8 @@
                   echo("<tr>\n");
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
-                  echo("<td><a href=\"removermeiocombate.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover Meio de Combate</a></td>\n");
+                  echo("<td><a href=\"editarmeio.php?table=meiocombate&nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Editar</a></td>\n");
+                  echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
               echo("</table></td>\n");
@@ -74,7 +75,8 @@
                   echo("<tr>\n");
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
-                  echo("<td><a href=\"removermeioapoio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover Meio de Apoio</a></td>\n");
+                  echo("<td><a href=\"editarmeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Editar</a></td>\n");
+                  echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
               echo("</table></td>\n");
@@ -86,7 +88,8 @@
                   echo("<tr>\n");
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
-                  echo("<td><a href=\"removermeiosocorro.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover Meio de Socorro</a></td>\n");
+                  echo("<td><a href=\"editarmeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Editar</a></td>\n");
+                  echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
               echo("</table></td></tr>\n");
