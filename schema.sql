@@ -27,14 +27,14 @@ drop table if exists solicita cascade;
 
 create table camara
    (numCamara 	integer	not null,
-   constraint pk_camara_num_camara primary key(numCamara));
+   primary key(numCamara));
 
 create table video
     (dataHoraInicio 	timestamp	not null,
     dataHoraFim   timestamp  not null,
     numCamara   integer not null,
-    constraint pk_video_data_hora_inicio primary key(dataHoraInicio),
-    constraint fk_video_num_camara foreign key(numCamara)
+    primary key(dataHoraInicio, numCamara),
+    foreign key(numCamara)
         references camara(numCamara) on delete cascade on update cascade);
 
 create table segmentoVideo
@@ -42,28 +42,27 @@ create table segmentoVideo
      duracao   timestamp  not null,
      dataHoraInicio   timestamp  not null,
      numCamara   integer not null,
-     constraint pk_segmento_video_numSegmento primary key(numSegmento),
-     constraint fk_segmento_video_data_hora_inicio foreign key(dataHoraInicio)
-        references video(dataHoraInicio) on delete cascade on update cascade,
-     constraint fk_segmento_video_num_camara foreign key(numCamara)
-        references video(numCamara) on delete cascade on update cascade);
+     primary key(numSegmento, dataHoraInicio, numCamara),
+     foreign key(dataHoraInicio, numCamara)
+        references video(dataHoraInicio, numCamara) on delete cascade on update cascade);
 
 create table local
     (moradaLocal 	varchar(255)	not null,
-    constraint pk_local_morada_local primary key(moradaLocal));
+    primary key(moradaLocal));
 
 create table vigia
      (moradaLocal 	varchar(255)	not null,
      numCamara   integer not null,
-     constraint fk_vigia_morada_local foreign key(moradaLocal)
+     primary key(moradaLocal, numCamara),
+     foreign key(moradaLocal)
         references local(moradaLocal) on delete cascade on update cascade,
-     constraint fk_vigia_num_camara foreign key(numCamara)
+     foreign key(numCamara)
         references camara(numCamara) on delete cascade on update cascade);
 
 create table processoSocorro
    /*RI: todo o processo de socorro esta associado a um ou mais eventoEmergencia??????????????????????????????????????????????????????????????????''*/
   (numProcessoSocorro	integer,
-   constraint pk_processo_socorro_num primary key(numProcessoSocorro));
+   primary key(numProcessoSocorro));
 
 create table eventoEmergencia
       (numTelefone 	varchar(15)	not null,
@@ -72,54 +71,54 @@ create table eventoEmergencia
       moradaLocal  varchar(255) not null,
       numProcessoSocorro  integer, /*RI: pode ser null*/
       unique(numTelefone, nomePessoa), /*ver restricao*/
-      constraint pk_evento_emergencia_num_telefone_instante_chamada primary key(numTelefone, instanteChamada),
-      constraint fk_evento_emergencia_morada_local foreign key(moradaLocal)
+      primary key(numTelefone, instanteChamada, moradaLocal, numProcessoSocorro),
+      foreign key(moradaLocal)
           references local(moradaLocal) on delete cascade on update cascade,
-      constraint fk_evento_emergencia_num_processo_socorro foreign key(numProcessoSocorro)
+      foreign key(numProcessoSocorro)
           references processoSocorro(numProcessoSocorro) on delete cascade on update cascade);
 
 create table entidadeMeio
      (nomeEntidade	varchar(200)	not null,
-      constraint pk_entidade_meio_nome_entidade primary key(nomeEntidade));
+      primary key(nomeEntidade));
 
 create table meio
      (numMeio	  integer	not null,
       nomeMeio	varchar(80)	not null,
       nomeEntidade  varchar(200)	not null,
-      constraint pk_meio_num primary key(numMeio),
-      constraint fk_meio_nome_entidade foreign key(nomeEntidade)
+      primary key(numMeio, nomeEntidade),
+      foreign key(nomeEntidade)
           references entidadeMeio(nomeEntidade) on delete cascade on update cascade);
 
 create table meioCombate
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
-      constraint fk_meio_combate_num_meio foreign key(numMeio)
-          references meio(numMeio) on delete cascade on update cascade,
-      constraint fk_meio_combate_nome_entidade foreign key(nomeEntidade)
-          references meio(nomeEntidade) on delete cascade on update cascade);
+      primary key(numMeio, nomeEntidade),
+      foreign key(numMeio, nomeEntidade)
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade);
 
 create table meioApoio
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
-      constraint fk_meio_apoio_num_meio foreign key(numMeio) references meio(numMeio) on delete cascade on update cascade,
-      constraint fk_meio_apoio_nome_entidade foreign key(nomeEntidade) references meio(nomeEntidade) on delete cascade on update cascade);
+      primary key(numMeio, nomeEntidade),
+      foreign key(numMeio, nomeEntidade)
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade);
 
 create table meioSocorro
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
-      constraint fk_meio_socorro_num_meio foreign key(numMeio) references meio(numMeio) on delete cascade on update cascade,
-      constraint fk_meio_socorro_nome_entidade foreign key(nomeEntidade) references meio(nomeEntidade) on delete cascade on update cascade);
+      primary key(numMeio, nomeEntidade),
+      foreign key(numMeio, nomeEntidade)
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade);
 
 create table transporta
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
       numVitimas  integer not null,
       numProcessoSocorro integer not null,
-      constraint fk_tranporta_num_meio foreign key(numMeio)
-          references meioSocorro(numMeio) on delete cascade on update cascade,
-      constraint fk_tranporta_nome_entidade foreign key(nomeEntidade)
-          references meioSocorro(nomeEntidade) on delete cascade on update cascade,
-      constraint fk_tranporta_num_processo_socorro foreign key(numProcessoSocorro)
+      primary key(numMeio, nomeEntidade, numProcessoSocorro),
+      foreign key(numMeio, nomeEntidade)
+          references meioSocorro(numMeio, nomeEntidade) on delete cascade on update cascade,
+      foreign key(numProcessoSocorro)
           references processoSocorro(numProcessoSocorro) on delete cascade on update cascade);
 
 create table alocado
@@ -127,27 +126,25 @@ create table alocado
       nomeEntidade	varchar(200)	not null,
       numHoras  integer not null,
       numProcessoSocorro integer not null,
-      constraint fk_alocado_num_meio foreign key(numMeio)
-          references meioApoio(numMeio) on delete cascade on update cascade,
-      constraint fk_alocado_nome_entidade foreign key(nomeEntidade)
-          references meioApoio(nomeEntidade) on delete cascade on update cascade,
-      constraint fk_alocado_num_processo_socorro foreign key(numProcessoSocorro)
+      primary key(numMeio, nomeEntidade, numProcessoSocorro),
+      foreign key(numMeio, nomeEntidade)
+          references meioApoio(numMeio, nomeEntidade) on delete cascade on update cascade,
+      foreign key(numProcessoSocorro)
           references processoSocorro(numProcessoSocorro) on delete cascade on update cascade);
 
 create table acciona
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
       numProcessoSocorro  integer not null,
-      constraint fk_alocado_num_meio foreign key(numMeio)
-          references meio(numMeio) on delete cascade on update cascade,
-      constraint fk_alocado_nome_entidade foreign key(nomeEntidade)
-          references meio(nomeEntidade) on delete cascade on update cascade,
-      constraint fk_alocado_num_processo_socorro foreign key(numProcessoSocorro)
+      primary key(numMeio, nomeEntidade, numProcessoSocorro),
+      foreign key(numMeio, nomeEntidade)
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade,
+      foreign key(numProcessoSocorro)
           references processoSocorro(numProcessoSocorro) on delete cascade on update cascade);
 
 create table coordenador
-     (idCoordenador	  int	not null,
-      constraint pk_coordenador_id primary key(idCoordenador));
+     (idCoordenador	  integer	not null,
+      primary key(idCoordenador));
 
 create table audita
      (idCoordenador	  integer	not null,
@@ -157,15 +154,12 @@ create table audita
       datahoraInicio    timestamp	not null,
       datahoraFim   timestamp	not null,
       dataAuditoria   date	not null,
-      texto text ,
-      constraint fk_audita_id_coordenador foreign key(idCoordenador)
+      texto text,
+      primary key(idCoordenador, numMeio, nomeEntidade, numProcessoSocorro),
+      foreign key(idCoordenador)
           references coordenador(idCoordenador) on delete cascade on update cascade,
-      constraint fk_audita_num_meio foreign key(numMeio)
-          references acciona(numMeio) on delete cascade on update cascade,
-      constraint fk_audita_nome_entidade foreign key(nomeEntidade)
-          references acciona(nomeEntidade) on delete cascade on update cascade,
-      constraint fk_audita_num_processo_socorro foreign key(numProcessoSocorro)
-          references acciona(numProcessoSocorro) on delete cascade on update cascade,
+      foreign key(numMeio, nomeEntidade, numProcessoSocorro)
+          references acciona(numMeio, nomeEntidade, numProcessoSocorro) on delete cascade on update cascade,
       /*RI: datahoraInicio < datahoraFim*/
       check (datahoraInicio < datahoraFim),
       /*RI: dataAuditoria >= dataAtual*/
@@ -177,9 +171,8 @@ create table solicita
       numCamara   integer not null,
       dataHoraInicio   timestamp	not null,
       dataHoraFim   timestamp	not null,
-      constraint fk_solicita_id_coordenador foreign key(idCoordenador)
+      primary key(idCoordenador, dataHoraInicio, numCamara),
+      foreign key(idCoordenador)
           references coordenador(idCoordenador) on delete cascade on update cascade,
-      constraint fk_solicita_data_hora_inicio foreign key(dataHoraInicio)
-          references video(dataHoraInicio) on delete cascade on update cascade,
-      constraint fk_solicita_num_camara foreign key(numCamara)
-          references video(numCamara) on delete cascade on update cascade);
+      foreign key(dataHoraInicio, numCamara)
+          references video(dataHoraInicio, numCamara) on delete cascade on update cascade);
