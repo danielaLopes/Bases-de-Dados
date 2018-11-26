@@ -104,11 +104,9 @@ $$ language plpgsql;
 Create or replace function random_nome_entidade() returns text as
 $$
 declare
-  entities text[] := '{Bombeiros Voluntarios, INEM, Protecao Civil,
-        Forca Aerea, Comandos Distritais de Operacoes de Socorro, PSP, GNR}';
   i integer := randomIntegerBetween(0,array_length(entities,1)-1);
 begin
-  return entities[i];
+  return 'Bombeiros' || i::text;
 end;
 $$ language plpgsql;
 
@@ -145,14 +143,17 @@ END;
 $$ LANGUAGE plpgsql;
 
 /*video*/
-CREATE OR REPLACE FUNCTION populate_video()
+CREATE OR REPLACE FUNCTION populate_video_segmento_video()
 RETURNS void AS
 $$
-DECLARE dHI timestamp; /*dataHoraInicio*/
+DECLARE numS integer := 1; /*numSegmento, cada video tem 4 segmentos*/
+        d interval := '6 hours'; /*duracao*/
+        dHI timestamp; /*dataHoraInicio*/
+        dHIseg timestamp; /*dataHoraInicio do segmento*/
         dHF timestamp; /*dataHoraFim*/
         n integer; /*numCamara*/
         i integer := 0;
-        times timestamp[] :=
+        times text[] :=
                 '{01-06-2018 00:00,02-06-2018 00:00,03-06-2018 00:00,04-06-2018 00:00,05-06-2018 00:00,
                 06-06-2018 00:00,07-06-2018 00:00,08-06-2018 00:00,09-06-2018 00:00,10-06-2018 00:00,11-06-2018 00:00,
                 12-06-2018 00:00,13-06-2018 00:00,14-06-2018 00:00,15-06-2018 00:00,16-06-2018 00:00,17-06-2018 00:00,
@@ -181,61 +182,20 @@ BEGIN
 FOR i IN 1..100
 LOOP
 
-    dHI := times[i];
-    dHF := times[i+1];
+    dHI := to_timestamp(times[i], 'DD-MM-YYYY HH24:MI');
+    dHF := to_timestamp(times[i+1], 'DD-MM-YYYY HH24:MI');
     n := randomIntegerBetween(1, 100);
 
     INSERT INTO video
     VALUES(dHI, dHF, n);
 
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
+    FOR numS IN 1..4
+    LOOP
 
-/*segmentoVideo*/
-/*preciso de ter todos os segmentos de video???*/
-CREATE OR REPLACE FUNCTION populate_segmento_video()
-RETURNS void AS
-$$
-DECLARE nS integer := 1; /*numSegmento, cada video tem 8 segmentos*/
-        d interval := '03:00'; /*duracao*/
-        dHI timestamp; /*dataHoraInicio*/
-        n integer; /*numCamara*/
-        i integer := 0;
-        times timestamp[] :=
-                '{01-06-2018 00:00,02-06-2018 00:00,03-06-2018 00:00,04-06-2018 00:00,05-06-2018 00:00,
-                06-06-2018 00:00,07-06-2018 00:00,08-06-2018 00:00,09-06-2018 00:00,10-06-2018 00:00,11-06-2018 00:00,
-                12-06-2018 00:00,13-06-2018 00:00,14-06-2018 00:00,15-06-2018 00:00,16-06-2018 00:00,17-06-2018 00:00,
-                18-06-2018 00:00,19-06-2018 00:00,20-06-2018 00:00,21-06-2018 00:00,22-06-2018 00:00,23-06-2018 00:00,
-                24-06-2018 00:00,25-06-2018 00:00,26-06-2018 00:00,27-06-2018 00:00,28-06-2018 00:00,29-06-2018 00:00,
-                30-06-2018 00:00,
+        INSERT INTO segmentoVideo
+        VALUES(numS, d, dHI, n);
 
-                01-07-2018 00:00,02-07-2018 00:00,03-07-2018 00:00,04-07-2018 00:00,05-07-2018 00:00,
-                06-07-2018 00:00,07-07-2018 00:00,08-07-2018 00:00,09-07-2018 00:00,10-07-2018 00:00,11-07-2018 00:00,
-                12-07-2018 00:00,13-07-2018 00:00,14-07-2018 00:00,15-07-2018 00:00,16-07-2018 00:00,17-07-2018 00:00,
-                18-07-2018 00:00,19-07-2018 00:00,20-07-2018 00:00,21-07-2018 00:00,22-07-2018 00:00,23-07-2018 00:00,
-                24-07-2018 00:00,25-07-2018 00:00,26-07-2018 00:00,27-07-2018 00:00,28-07-2018 00:00,29-07-2018 00:00,
-                30-07-2018 00:00,31-07-2018 00:00,
-
-                01-08-2018 00:00,02-08-2018 00:00,03-08-2018 00:00,04-08-2018 00:00,05-08-2018 00:00,
-                06-08-2018 00:00,07-08-2018 00:00,08-08-2018 00:00,09-08-2018 00:00,10-08-2018 00:00,11-08-2018 00:00,
-                12-08-2018 00:00,13-08-2018 00:00,14-08-2018 00:00,15-08-2018 00:00,16-08-2018 00:00,17-08-2018 00:00,
-                18-08-2018 00:00,19-08-2018 00:00,20-08-2018 00:00,21-08-2018 00:00,22-08-2018 00:00,23-08-2018 00:00,
-                24-08-2018 00:00,25-08-2018 00:00,26-08-2018 00:00,27-08-2018 00:00,28-08-2018 00:00,29-08-2018 00:00,
-                30-08-2018 00:00,31-08-2018 00:00,
-
-                01-09-2018 00:00,02-09-2018 00:00,03-09-2018 00:00,04-09-2018 00:00,05-09-2018 00:00,
-                06-09-2018 00:00,07-09-2018 00:00,08-09-2018 00:00,09-09-2018 00:00,10-09-2018 00:00}';
-BEGIN
-
-FOR i IN 1..100
-LOOP
-
-    dHI := times[i];
-    n := randomIntegerBetween(1, 100);
-
-    INSERT INTO segmentoVideo
-    VALUES(numS, d, dHI, n);
+    END LOOP;
 
 END LOOP;
 END;
@@ -276,7 +236,7 @@ RETURNS void AS
 $$
 DECLARE m varchar(255); /*moradaLocal*/
         n integer; /*numCamara*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 
 n := randomIntegerBetween(1, 100);
@@ -304,7 +264,7 @@ CREATE OR REPLACE FUNCTION populate_processo_socorro()
 RETURNS void AS
 $$
 DECLARE n integer; /*numProcessoSocorro*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -328,14 +288,14 @@ DECLARE numT varchar(15); /*numTelefone*/
         nP varchar(80); /*nomePessoa*/
         mL varchar (255); /*moradaLocal*/
         numP integer; /*numProcessoSocorro*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
 LOOP
 
     numT := random_numeric_string(9);
-    iC := ;
+    iC := '00:00';
     nP := random_nome_Pessoa();
     mL := random_morada_local();
     numP := randomIntegerBetween(1,100);
@@ -352,13 +312,13 @@ CREATE OR REPLACE FUNCTION populate_entidade_meio()
 RETURNS void AS
 $$
 DECLARE n varchar(80); /*nomeEntidade*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
 LOOP
-    /*TEMOS DE TER 100 ENTIDADES DIFERENTES???*/
-    n := ;
+
+    n := 'Bombeiros' || i::text ;
 
     INSERT INTO entidadeMeio
     VALUES(n);
@@ -374,7 +334,7 @@ $$
 DECLARE numM integer; /*numMeio*/
         nM varchar(80); /*nomeMeio*/
         nE varchar(200); /*nomeEntidade*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -397,7 +357,7 @@ RETURNS void AS
 $$
 DECLARE numM integer; /*numMeio*/
         nE varchar(200); /*nomeEntidade*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -435,7 +395,7 @@ DECLARE numM integer; /*numMeio*/
         nE varchar(200); /*nomeMeio*/
         numV integer; /*numVitimas*/
         numP integer; /*numProcessoSocorro*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -461,7 +421,7 @@ DECLARE numM integer; /*numMeio*/
         nE varchar(200); /*nomeMeio*/
         numH integer; /*numHoras*/
         numP integer; /*numProcessoSocorro*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -486,7 +446,7 @@ $$
 DECLARE numM integer; /*numMeio*/
         nE varchar(200); /*nomeMeio*/
         numP integer; /*numProcessoSocorro*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -508,7 +468,7 @@ CREATE OR REPLACE FUNCTION populate_coordenador()
 RETURNS void AS
 $$
 DECLARE iC integer; /*idCoordenador*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -535,7 +495,7 @@ DECLARE iC integer; /*idCoordenador*/
         dhF timestamp; /*datahoraFim*/
         dA date; /*dataAuditoria*/
         t text; /*texto*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
@@ -545,9 +505,9 @@ LOOP
     numM := randomIntegerBetween(1, 100);
     nE := random_numeric_string(200);
     numP := randomIntegerBetween(1, 100);
-    dhI := ;
-    dhF := ;
-    dA := ;
+    dhI := '00:00';
+    dhF := '00:00';
+    dA := '00:00';
     t = random_numeric_string(100);
 
     INSERT INTO audita
@@ -566,17 +526,17 @@ DECLARE iC integer; /*idCoordenador*/
         numC integer; /*numCamara*/
         dHI timestamp; /*dataHoraInicio*/
         dHF timestamp; /*dataHoraFim*/
-        i integer := 0,
+        i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
 LOOP
 
     iC := randomIntegerBetween(1, 100);
-    dHIV := ;
+    dHIV := '00:00';
     numC := randomIntegerBetween(1, 100);
-    dHI := ;
-    dHF := ;
+    dHI := '00:00';
+    dHF := '00:00';
 
     INSERT INTO solicita
     VALUES(iC, dHIV, numC, dHI, dHF);
@@ -587,8 +547,7 @@ $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
     PERFORM populate_camara();
-    PERFORM populate_video();
-    /*PERFORM populate_segmento_video();*/
+    PERFORM populate_video_segmento_video();
     PERFORM populate_local();
     /*PERFORM populate_vigia();
     PERFORM populate_evento_emergencia();

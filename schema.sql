@@ -39,7 +39,7 @@ create table video
 
 create table segmentoVideo
      (numSegmento 	integer	not null,
-     duracao   timestamp  not null,
+     duracao   interval  not null,
      dataHoraInicio   timestamp  not null,
      numCamara   integer not null,
      primary key(numSegmento, dataHoraInicio, numCamara),
