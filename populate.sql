@@ -33,6 +33,23 @@ begin
 end;
 $$ language plpgsql;*/
 
+Create or replace function random_string(length integer) returns text as
+$$
+declare
+  chars text[] := '{0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z}';
+  result text := '';
+  i integer := 0;
+begin
+  if length < 0 then
+    raise exception 'Given length cannot be less than 0';
+  end if;
+  for i in 1..length loop
+    result := result || chars[1+random()*(array_length(chars, 1)-1)];
+  end loop;
+  return result;
+end;
+$$ language plpgsql;
+
 Create or replace function random_numeric_string(length integer) returns text as
 $$
 declare
@@ -66,9 +83,44 @@ declare
       Monchique,Montijo,Nisa,Odemira,Odivelas,Oeiras,Oliveira do Hospital,Ourique,
       Penacova,Penafiel,Peniche,Pombal,Porto,Sabrosa,Sabugal,Santana,Serpa,
       Tavira,Tomar,Tondela,Viseu}';
-  i integer := randomIntegerBetween(0,99);
+  i integer := randomIntegerBetween(0,array_length(locals,1)-1);
 begin
-  return text[i];
+  return locals[i];
+end;
+$$ language plpgsql;
+
+Create or replace function random_nome_Pessoa() returns text as
+$$
+declare
+  names text[] := '{Daniela, Madalena, Afonso, Jorge, Pedro, Taissa,
+        Joana, Maria, Joaquim, Oliver, Bruno, Mariana, Antonio,
+        Julia, Manuel, Catarina, Candido, Ines, Margarida, Magda}';
+  i integer := randomIntegerBetween(0,array_length(names,1)-1);
+begin
+  return names[i];
+end;
+$$ language plpgsql;
+
+Create or replace function random_nome_entidade() returns text as
+$$
+declare
+  entities text[] := '{Bombeiros Voluntarios, INEM, Protecao Civil,
+        Forca Aerea, Comandos Distritais de Operacoes de Socorro, PSP, GNR}';
+  i integer := randomIntegerBetween(0,array_length(entities,1)-1);
+begin
+  return entities[i];
+end;
+$$ language plpgsql;
+
+Create or replace function random_timestamp() returns text as
+$$
+declare
+  day integer;
+  month integer;
+  hour integer;
+  minute integer;
+begin
+
 end;
 $$ language plpgsql;
 
@@ -96,32 +148,98 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION populate_video()
 RETURNS void AS
 $$
-DECLARE day integer;
-        month integer;
-        dHI timestamp; /*dataHoraInicio*/
+DECLARE dHI timestamp; /*dataHoraInicio*/
         dHF timestamp; /*dataHoraFim*/
         n integer; /*numCamara*/
-        i integer := 0,
-        times timestamp[] := generateTimeStamps();
+        i integer := 0;
+        times timestamp[] :=
+                '{01-06-2018 00:00,02-06-2018 00:00,03-06-2018 00:00,04-06-2018 00:00,05-06-2018 00:00,
+                06-06-2018 00:00,07-06-2018 00:00,08-06-2018 00:00,09-06-2018 00:00,10-06-2018 00:00,11-06-2018 00:00,
+                12-06-2018 00:00,13-06-2018 00:00,14-06-2018 00:00,15-06-2018 00:00,16-06-2018 00:00,17-06-2018 00:00,
+                18-06-2018 00:00,19-06-2018 00:00,20-06-2018 00:00,21-06-2018 00:00,22-06-2018 00:00,23-06-2018 00:00,
+                24-06-2018 00:00,25-06-2018 00:00,26-06-2018 00:00,27-06-2018 00:00,28-06-2018 00:00,29-06-2018 00:00,
+                30-06-2018 00:00,
+
+                01-07-2018 00:00,02-07-2018 00:00,03-07-2018 00:00,04-07-2018 00:00,05-07-2018 00:00,
+                06-07-2018 00:00,07-07-2018 00:00,08-07-2018 00:00,09-07-2018 00:00,10-07-2018 00:00,11-07-2018 00:00,
+                12-07-2018 00:00,13-07-2018 00:00,14-07-2018 00:00,15-07-2018 00:00,16-07-2018 00:00,17-07-2018 00:00,
+                18-07-2018 00:00,19-07-2018 00:00,20-07-2018 00:00,21-07-2018 00:00,22-07-2018 00:00,23-07-2018 00:00,
+                24-07-2018 00:00,25-07-2018 00:00,26-07-2018 00:00,27-07-2018 00:00,28-07-2018 00:00,29-07-2018 00:00,
+                30-07-2018 00:00,31-07-2018 00:00,
+
+                01-08-2018 00:00,02-08-2018 00:00,03-08-2018 00:00,04-08-2018 00:00,05-08-2018 00:00,
+                06-08-2018 00:00,07-08-2018 00:00,08-08-2018 00:00,09-08-2018 00:00,10-08-2018 00:00,11-08-2018 00:00,
+                12-08-2018 00:00,13-08-2018 00:00,14-08-2018 00:00,15-08-2018 00:00,16-08-2018 00:00,17-08-2018 00:00,
+                18-08-2018 00:00,19-08-2018 00:00,20-08-2018 00:00,21-08-2018 00:00,22-08-2018 00:00,23-08-2018 00:00,
+                24-08-2018 00:00,25-08-2018 00:00,26-08-2018 00:00,27-08-2018 00:00,28-08-2018 00:00,29-08-2018 00:00,
+                30-08-2018 00:00,31-08-2018 00:00,
+
+                01-09-2018 00:00,02-09-2018 00:00,03-09-2018 00:00,04-09-2018 00:00,05-09-2018 00:00,
+                06-09-2018 00:00,07-09-2018 00:00,08-09-2018 00:00,09-09-2018 00:00,10-09-2018 00:00}';
 BEGIN
-raise notice 'Value: %', times[0];
 
 FOR i IN 1..100
 LOOP
 
     dHI := times[i];
-    dHF := times[i + 1];
+    dHF := times[i+1];
     n := randomIntegerBetween(1, 100);
 
     INSERT INTO video
-    VALUES(dHI::timestamp, dHF, n);
+    VALUES(dHI, dHF, n);
 
 END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
 /*segmentoVideo*/
+/*preciso de ter todos os segmentos de video???*/
+CREATE OR REPLACE FUNCTION populate_segmento_video()
+RETURNS void AS
+$$
+DECLARE nS integer := 1; /*numSegmento, cada video tem 8 segmentos*/
+        d interval := '03:00'; /*duracao*/
+        dHI timestamp; /*dataHoraInicio*/
+        n integer; /*numCamara*/
+        i integer := 0;
+        times timestamp[] :=
+                '{01-06-2018 00:00,02-06-2018 00:00,03-06-2018 00:00,04-06-2018 00:00,05-06-2018 00:00,
+                06-06-2018 00:00,07-06-2018 00:00,08-06-2018 00:00,09-06-2018 00:00,10-06-2018 00:00,11-06-2018 00:00,
+                12-06-2018 00:00,13-06-2018 00:00,14-06-2018 00:00,15-06-2018 00:00,16-06-2018 00:00,17-06-2018 00:00,
+                18-06-2018 00:00,19-06-2018 00:00,20-06-2018 00:00,21-06-2018 00:00,22-06-2018 00:00,23-06-2018 00:00,
+                24-06-2018 00:00,25-06-2018 00:00,26-06-2018 00:00,27-06-2018 00:00,28-06-2018 00:00,29-06-2018 00:00,
+                30-06-2018 00:00,
 
+                01-07-2018 00:00,02-07-2018 00:00,03-07-2018 00:00,04-07-2018 00:00,05-07-2018 00:00,
+                06-07-2018 00:00,07-07-2018 00:00,08-07-2018 00:00,09-07-2018 00:00,10-07-2018 00:00,11-07-2018 00:00,
+                12-07-2018 00:00,13-07-2018 00:00,14-07-2018 00:00,15-07-2018 00:00,16-07-2018 00:00,17-07-2018 00:00,
+                18-07-2018 00:00,19-07-2018 00:00,20-07-2018 00:00,21-07-2018 00:00,22-07-2018 00:00,23-07-2018 00:00,
+                24-07-2018 00:00,25-07-2018 00:00,26-07-2018 00:00,27-07-2018 00:00,28-07-2018 00:00,29-07-2018 00:00,
+                30-07-2018 00:00,31-07-2018 00:00,
+
+                01-08-2018 00:00,02-08-2018 00:00,03-08-2018 00:00,04-08-2018 00:00,05-08-2018 00:00,
+                06-08-2018 00:00,07-08-2018 00:00,08-08-2018 00:00,09-08-2018 00:00,10-08-2018 00:00,11-08-2018 00:00,
+                12-08-2018 00:00,13-08-2018 00:00,14-08-2018 00:00,15-08-2018 00:00,16-08-2018 00:00,17-08-2018 00:00,
+                18-08-2018 00:00,19-08-2018 00:00,20-08-2018 00:00,21-08-2018 00:00,22-08-2018 00:00,23-08-2018 00:00,
+                24-08-2018 00:00,25-08-2018 00:00,26-08-2018 00:00,27-08-2018 00:00,28-08-2018 00:00,29-08-2018 00:00,
+                30-08-2018 00:00,31-08-2018 00:00,
+
+                01-09-2018 00:00,02-09-2018 00:00,03-09-2018 00:00,04-09-2018 00:00,05-09-2018 00:00,
+                06-09-2018 00:00,07-09-2018 00:00,08-09-2018 00:00,09-09-2018 00:00,10-09-2018 00:00}';
+BEGIN
+
+FOR i IN 1..100
+LOOP
+
+    dHI := times[i];
+    n := randomIntegerBetween(1, 100);
+
+    INSERT INTO segmentoVideo
+    VALUES(numS, d, dHI, n);
+
+END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 /*local*/
 CREATE OR REPLACE FUNCTION populate_local()
@@ -160,11 +278,18 @@ DECLARE m varchar(255); /*moradaLocal*/
         n integer; /*numCamara*/
         i integer := 0,
 BEGIN
-/*loops 100*/
-FOR i IN 1..100
+
+n := randomIntegerBetween(1, 100);
+INSERT INTO vigia
+VALUES('Monchique', n);
+n := randomIntegerBetween(1, 100);
+INSERT INTO vigia
+VALUES('Oliveira do Hospital', n);
+
+FOR i IN 3..100
 LOOP
 
-    m := ;
+    m := random_morada_local();
     n := randomIntegerBetween(1, 100);
 
     INSERT INTO vigia
@@ -210,10 +335,10 @@ FOR i IN 1..100
 LOOP
 
     numT := random_numeric_string(9);
-    iC :=;
-    nP :=;
-    mL :=;
-    numP :=;
+    iC := ;
+    nP := random_nome_Pessoa();
+    mL := random_morada_local();
+    numP := randomIntegerBetween(1,100);
 
     INSERT INTO eventoEmergencia
     VALUES(numT, iC, nP, mL, numP);
@@ -226,17 +351,17 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION populate_entidade_meio()
 RETURNS void AS
 $$
-DECLARE nM varchar(80); /*nomeMeio*/
+DECLARE n varchar(80); /*nomeEntidade*/
         i integer := 0,
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
 LOOP
-
-    nM := random_numeric_string(9);
+    /*TEMOS DE TER 100 ENTIDADES DIFERENTES???*/
+    n := ;
 
     INSERT INTO entidadeMeio
-    VALUES(nM);
+    VALUES(n);
 
 END LOOP;
 END;
@@ -256,8 +381,8 @@ FOR i IN 1..100
 LOOP
 
     numM := randomIntegerBetween(1, 100);
-    nM := random_numeric_string(80);
-    nE := random_numeric_string(200);
+    nM := random_string(10);
+    nE := random_nome_entidade();
 
     INSERT INTO meio
     VALUES(numM, nM, nE);
