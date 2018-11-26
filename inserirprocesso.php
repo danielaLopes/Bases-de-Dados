@@ -12,11 +12,11 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "INSERT INTO processosocorro VALUES(:numprocessosocorro);";
-        echo("<p>O processo de socorro {$numprocessosocorro} foi inserido</p>");
 
         $result = $db->prepare($sql);
         $result->execute([':numprocessosocorro' => $numprocessosocorro]);
 
+        echo("<p>O processo de socorro {$numprocessosocorro} foi inserido</p>");
         $db = null;
     }
     catch (PDOException $e)

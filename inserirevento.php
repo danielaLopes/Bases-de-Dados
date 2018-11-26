@@ -16,11 +16,11 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "INSERT INTO eventoemergencia VALUES(:numtelefone,:instantechamada,:nomepessoa,:moradalocal,:numprocessosocorro);";
-        echo("<p>O Evento de Emergencia foi inserido\nNumero de telefone: {$numtelefone}\nInstante de Chamada: {$instantechamada}</p>");
 
         $result = $db->prepare($sql);
         $result->execute(array($numtelefone,$instantechamada,$nomepessoa,$moradalocal,$numprocessosocorro));
 
+        echo("<p>O Evento de Emergencia foi inserido\n</p><p>Numero de telefone: {$numtelefone}\n</p><p>Instante de Chamada: {$instantechamada}</p>");
         $db = null;
     }
     catch (PDOException $e)

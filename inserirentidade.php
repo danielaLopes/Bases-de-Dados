@@ -1,7 +1,7 @@
 <html>
     <body>
 <?php
-    $moradalocal = $_REQUEST['moradalocal'];
+    $nomeentidade = $_REQUEST['nomeentidade'];
     try
     {
         $host = "db.ist.utl.pt";
@@ -11,12 +11,12 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $sql = "INSERT INTO local VALUES(:moradalocal);";
+        $sql = "INSERT INTO entidademeio VALUES(:nomeentidade);";
 
         $result = $db->prepare($sql);
-        $result->execute([':moradalocal' => $moradalocal]);
+        $result->execute([':nomeentidade' => $nomeentidade]);
 
-        echo("<p>{$moradalocal} foi inserido</p>");
+        echo("<p>A entidade {$nomeentidade} foi inserida</p>");
         $db = null;
     }
     catch (PDOException $e)

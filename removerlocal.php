@@ -12,11 +12,11 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "DELETE FROM local WHERE moradalocal =:moradalocal;";
-        echo("<p>{$moradalocal} foi removido</p>");
 
         $result = $db->prepare($sql);
         $result->execute([':moradalocal' => $moradalocal]);
 
+        echo("<p>{$moradalocal} foi removido</p>");
         $db = null;
     }
     catch (PDOException $e)

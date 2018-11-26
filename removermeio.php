@@ -1,8 +1,8 @@
 <html>
     <body>
 <?php
-    $numtelefone = $_REQUEST['nummeio'];
-    $instantechamada = $_REQUEST['nomeentidade'];
+    $nummeio = $_REQUEST['nummeio'];
+    $nomeentidade = $_REQUEST['nomeentidade'];
     try
     {
         $host = "db.ist.utl.pt";
@@ -13,11 +13,11 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "DELETE FROM meio WHERE nummeio =:nummeio AND nomeentidade =:nomeentidade ;";
-        echo("<p>O evento representado pelo numero de telefone: {$nummeio} e pelo instante de chamada: {$nomeentidade} foi removido</p>");
 
         $result = $db->prepare($sql);
         $result->execute(array($nummeio, $nomeentidade));
 
+        echo("<p>O meio representado pelo numero do meio: {$nummeio} e pelo nome da entidade: {$nomeentidade} foi removido</p>");
         $db = null;
     }
     catch (PDOException $e)

@@ -13,11 +13,11 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "DELETE FROM eventoemergencia WHERE numtelefone =:numtelefone AND instantechamada =:instantechamada ;";
-        echo("<p>O evento representado pelo numero de telefone: {$numtelefone} e pelo instante de chamada: {$instantechamada} foi removido</p>");
 
         $result = $db->prepare($sql);
         $result->execute(array($numtelefone, $instantechamada));
 
+        echo("<p>O evento representado pelo numero de telefone: {$numtelefone} e pelo instante de chamada: {$instantechamada} foi removido</p>");
         $db = null;
     }
     catch (PDOException $e)

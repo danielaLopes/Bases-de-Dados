@@ -12,11 +12,11 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "DELETE FROM processosocorro WHERE numprocessosocorro =:numprocessosocorro;";
-        echo("<p>{$numprocessosocorro} foi removido</p>");
 
         $result = $db->prepare($sql);
         $result->execute([':numprocessosocorro' => $numprocessosocorro]);
 
+        echo("<p>{$numprocessosocorro} foi removido</p>");
         $db = null;
     }
     catch (PDOException $e)

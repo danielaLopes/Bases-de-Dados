@@ -1,9 +1,9 @@
 <html>
     <body>
 <?php
-    $nummeio = $_REQUEST['nummeio'];
-    $nomemeio = $_REQUEST['nomemeio'];
-    $nomeentidade = $_REQUEST['nomeentidade'];
+    $nummeio = $_REQUEST['nummeiocombate'];
+    $nomemeio = 'Meio de Combate';
+    $nomeentidade = $_REQUEST['nomeentidadecombate'];
     try
     {
         $host = "db.ist.utl.pt";
@@ -14,11 +14,15 @@
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $sql = "INSERT INTO meio VALUES(:nummeio,:nomemeio,:nomeentidade);";
+        $sql1 = "INSERT INTO meiocombate VALUES(:nummeio,:nomeentidade);";
 
         $result = $db->prepare($sql);
         $result->execute(array($nummeio,$nomemeio,$nomeentidade));
 
-        echo("<p>O meio foi inserido\n</p><p>Nome do Meio: {$nomemeio}\n</p><p>Nome da Entidade: {$nomeentidade}</p>");
+        $result1 = $db->prepare($sql1);
+        $result1->execute(array($nummeio,$nomeentidade));
+
+        echo("<p>O meio de combate foi inserido\n</p><p>Nome do Meio: {$nomemeio}\n</p><p>Nome da Entidade: {$nomeentidade}</p>");
         $db = null;
     }
     catch (PDOException $e)

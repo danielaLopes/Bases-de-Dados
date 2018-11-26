@@ -22,7 +22,7 @@
               {
                   echo("<tr>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
-                  echo("<td><a href=\"removerentidade.php?moradalocal={$row['nomeentidade']}\">Remover Entidade</a></td>\n");
+                  echo("<td><a href=\"removerentidade.php?nomeentidade={$row['nomeentidade']}\">Remover Entidade</a></td>\n");
                   echo("</tr>\n");
               }
               echo("</table>\n");
