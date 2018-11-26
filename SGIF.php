@@ -20,7 +20,8 @@
         echo("<a href=\"local.php\">Locais</a></br>");
         echo("<a href=\"eventoemergencia.php\">Eventos de Emergencia</a></br>");
         echo("<a href=\"processo.php\">Processos de Socorro</a></br>");
-        echo("<a href=\"local.php\">Meios e Entidades</a></br>");
+        echo("<a href=\"meio.php\">Meios</a></br>");
+        echo("<a href=\"entidade.php\">Entidades</a></br>");
 
         /*echo("<table border=\"0\" cellspacing=\"5\">\n");
 
