@@ -175,4 +175,4 @@ create table solicita
       foreign key(idCoordenador)
           references coordenador(idCoordenador) on delete cascade on update cascade,
       foreign key(dataHoraInicioVideo, numCamara)
-          references video(dataHoraInicio, numCamara) on delete cascade on update cascade);
+references video(dataHoraInicio, numCamara) on delete cascade on update cascade);

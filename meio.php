@@ -37,6 +37,7 @@
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomemeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
+                  echo("<td><a href=\"associarameio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Associar Processo</a></td>\n");
                   echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
@@ -63,7 +64,6 @@
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
                   echo("<td><a href=\"editarmeio.php?table=meiocombate&nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Editar</a></td>\n");
-                  echo("<td><a href=\"associarprocesso.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Associar Processo</a></td>\n");
                   echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
@@ -77,7 +77,6 @@
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
                   echo("<td><a href=\"editarmeio.php?table=meioapoionummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Editar</a></td>\n");
-                  echo("<td><a href=\"associarprocesso.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Associar Processo</a></td>\n");
                   echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
@@ -91,7 +90,6 @@
                   echo("<td>{$row['nummeio']}</td>\n");
                   echo("<td>{$row['nomeentidade']}</td>\n");
                   echo("<td><a href=\"editarmeio.php?table=meiosocorronummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Editar</a></td>\n");
-                  echo("<td><a href=\"associarprocesso.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Associar Processo</a></td>\n");
                   echo("<td><a href=\"removermeio.php?nummeio={$row['nummeio']}&nomeentidade={$row['nomeentidade']}\">Remover</a></td>\n");
                   echo("</tr>\n");
               }
@@ -100,11 +98,12 @@
               /*meioCombate-----------------------------------------------------------*/
               echo("<tr><td>");
 
-              echo("<form action='inserirmeiocombate.php' method='post'>");
+              echo("<form action='inserirmeios.php?table=meiocombate' method='post'>");
               echo("<table border=\"0\" cellspacing=\"5\">\n");
               echo("<tr><td><h3>Inserir Meio de Combate</h3></td></tr>");
-              echo("<tr><td>Numero do Meio: </td><td><input type='text' name='nummeiocombate'/></td></tr>");
-              echo("<tr><td>Nome da Entidade: </td><td><input type='text' name='nomeentidadecombate'/></td></tr>");
+              echo("<tr><td>Numero do Meio: </td><td><input type='text' name='nummeio'/></td></tr>");
+              echo("<tr><td>Nome do Meio: </td><td><input type='text' name='nomemeio'/></td></tr>");
+              echo("<tr><td>Nome da Entidade: </td><td><input type='text' name='nomeentidade'/></td></tr>");
               echo("<tr><td><input type='submit' value='Inserir'/></td></tr></table>");
               echo("</form>");
 
@@ -113,11 +112,12 @@
               /*meioApoio-----------------------------------------------------------*/
               echo("<td>");
 
-              echo("<form action='inserirmeioapoio.php' method='post'>");
+              echo("<form action='inserirmeios.php?table=meioapoio' method='post'>");
               echo("<table border=\"0\" cellspacing=\"5\">\n");
               echo("<tr><td><h3>Inserir Meio de Apoio</h3></td></tr>");
-              echo("<tr><td>Numero do Meio: </td><td><input type='text' name='nummeioapoio'/></td></tr>");
-              echo("<tr><td>Nome da Entidade: </td><td><input type='text' name='nomeentidadeapoio'/></td></tr>");
+              echo("<tr><td>Numero do Meio: </td><td><input type='text' name='nummeio'/></td></tr>");
+              echo("<tr><td>Nome do Meio: </td><td><input type='text' name='nomemeio'/></td></tr>");
+              echo("<tr><td>Nome da Entidade: </td><td><input type='text' name='nomeentidade'/></td></tr>");
               echo("<tr><td><input type='submit' value='Inserir'/></td></tr></table>");
               echo("</form>");
 
@@ -126,11 +126,12 @@
               /*meioSocorro-----------------------------------------------------------*/
               echo("<td>");
 
-              echo("<form action='inserirmeiosocorro.php' method='post'>");
+              echo("<form action='inserirmeios.php?table=meiosocorro' method='post'>");
               echo("<table border=\"0\" cellspacing=\"5\">\n");
               echo("<tr><td><h3>Inserir Meio de Socorro</h3></td></tr>");
-              echo("<tr><td>Numero do Meio: </td><td><input type='text' name='nummeiosocorro'/></td></tr>");
-              echo("<tr><td>Nome da Entidade: </td><td><input type='text' name='nomeentidadesocorro'/></td></tr>");
+              echo("<tr><td>Numero do Meio: </td><td><input type='text' name='nummeio'/></td></tr>");
+              echo("<tr><td>Nome do Meio: </td><td><input type='text' name='nomemeio'/></td></tr>");
+              echo("<tr><td>Nome da Entidade: </td><td><input type='text' name='nomeentidade'/></td></tr>");
               echo("<tr><td><input type='submit' value='Inserir'/></td></tr></table>");
               echo("</form>");
 

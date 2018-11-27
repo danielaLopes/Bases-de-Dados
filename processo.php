@@ -24,7 +24,6 @@
                   echo("<td>{$row['numprocessosocorro']}</td>\n");
                   echo("<td><a href=\"removerprocesso.php?numprocessosocorro={$row['numprocessosocorro']}\">Remover</a></td>\n");
                   echo("<td><a href=\"listarmeiosacionados.php?numprocessosocorro={$row['numprocessosocorro']}\">Listar Meios Acionados</a></td>\n");
-                  echo("<td><a href=\"listarmeiosacionados.php?numprocessosocorro={$row['numprocessosocorro']}\">Listar Meios Socorro Acionados</a></td>\n");
                   echo("</tr>\n");
               }
               echo("</table>\n");

@@ -22,6 +22,7 @@
               {
                   echo("<tr>\n");
                   echo("<td>{$row['moradalocal']}</td>\n");
+                  echo("<td><a href=\"listarmeiossocorrolocal.php?moradalocal={$row['moradalocal']}\">Listar Meios de Socorro Acionados</a></td>\n");
                   echo("<td><a href=\"removerlocal.php?moradalocal={$row['moradalocal']}\">Remover Local</a></td>\n");
                   echo("</tr>\n");
               }

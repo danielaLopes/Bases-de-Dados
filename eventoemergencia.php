@@ -26,6 +26,7 @@
                   echo("<td>{$row['nomepessoa']}</td>\n");
                   echo("<td>{$row['moradalocal']}</td>\n");
                   echo("<td>{$row['numprocessosocorro']}</td>\n");
+                  echo("<td><a href=\"associaraevento.php?numtelefone={$row['numtelefone']}&instantechamada={$row['instantechamada']}&numprocessosocorro={$row['numprocessosocorro']}\">Associar Evento</a></td>\n");
                   echo("<td><a href=\"removerevento.php?numtelefone={$row['numtelefone']}&instantechamada={$row['instantechamada']}\">Remover Evento de Emergencia</a></td>\n");
                   echo("</tr>\n");
               }
