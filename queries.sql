@@ -1,15 +1,14 @@
 SELECT numprocessosocorro
 FROM(
-  SELECT numprocessosocorro, COUNT(nummeio)
+  SELECT numprocessosocorro, COUNT(*)
   FROM acciona
-  GROUP BY numprocessosocorro) as foo;
-/*
-  HAVING COUNT(nummeio) >= all (
-    SELECT numprocessosocorro, COUNT(nummeio)
+  GROUP BY numprocessosocorro
+  HAVING COUNT(*) >= all (
+    SELECT COUNT(*)
     FROM acciona
-    GROUP BY numprocessosocorro)) as foo;*/
+    GROUP BY numprocessosocorro)) as foo;
 
-/*
+
 SELECT nomeentidade
 FROM r NATURAL JOIN (
   SELECT MAX(Count)
