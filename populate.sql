@@ -17,22 +17,6 @@ begin
 end;
 $$ language plpgsql;
 
-/*returns random integer between a and b*/
-/*Create or replace function generateTimeStamps() returns timestamp[] as
-$$
-declare
-  times timestamp[];
-begin
-  times = generate_series(
-       (date '2018-01-01')::timestamp,
-       (date '2018-12-31')::timestamp,
-       interval '1 day');
-  raise notice 'Value: %', times[0];
-
-    return (times);
-end;
-$$ language plpgsql;*/
-
 Create or replace function random_string(length integer) returns text as
 $$
 declare
@@ -83,8 +67,9 @@ declare
       Monchique,Montijo,Nisa,Odemira,Odivelas,Oeiras,Oliveira do Hospital,Ourique,
       Penacova,Penafiel,Peniche,Pombal,Porto,Sabrosa,Sabugal,Santana,Serpa,
       Tavira,Tomar,Tondela,Viseu}';
-  i integer := randomIntegerBetween(0,array_length(locals,1)-1);
+  i integer;
 begin
+  i := randomIntegerBetween(1,array_length(locals,1));
   return locals[i];
 end;
 $$ language plpgsql;
@@ -95,7 +80,7 @@ declare
   names text[] := '{Daniela, Madalena, Afonso, Jorge, Pedro, Taissa,
         Joana, Maria, Joaquim, Oliver, Bruno, Mariana, Antonio,
         Julia, Manuel, Catarina, Candido, Ines, Margarida, Magda}';
-  i integer := randomIntegerBetween(0,array_length(names,1)-1);
+  i integer := randomIntegerBetween(1,array_length(names,1));
 begin
   return names[i];
 end;
@@ -104,24 +89,35 @@ $$ language plpgsql;
 Create or replace function random_nome_entidade() returns text as
 $$
 declare
-  i integer := randomIntegerBetween(0,array_length(entities,1)-1);
+  i integer := randomIntegerBetween(1,100);
 begin
   return 'Bombeiros' || i::text;
 end;
 $$ language plpgsql;
 
-Create or replace function random_timestamp() returns text as
+Create or replace function random_timestamp() returns timestamp as
 $$
-declare
-  day integer;
-  month integer;
-  hour integer;
-  minute integer;
 begin
-
+return date_trunc('second', to_timestamp('01-06-2018 00:00', 'DD-MM-YYYY HH24:MI') +
+       random() * interval '3 months');
 end;
 $$ language plpgsql;
 
+Create or replace function random_timestamp_after(start timestamp) returns timestamp as
+$$
+begin
+return date_trunc('second', to_timestamp(to_char(start,'DD-MM-YYYY HH24:MI'),'DD-MM-YYYY HH24:MI')
+    + random() * interval '1 day');
+end;
+$$ language plpgsql;
+
+Create or replace function random_date() returns date as
+$$
+begin
+return date_trunc('day', to_timestamp(to_char(current_date,'DD-MM-YYYY'),'DD-MM-YYYY') -
+       random() * interval '2 months');
+end;
+$$ language plpgsql;
 ----------------------------------------
 -- Populate Relations
 ----------------------------------------
@@ -142,16 +138,21 @@ END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
-/*video*/
-CREATE OR REPLACE FUNCTION populate_video_segmento_video()
+/*video, segmentoVideo e vigia*/
+CREATE OR REPLACE FUNCTION populate_video_segmento_video_vigia_solicita()
 RETURNS void AS
 $$
-DECLARE numS integer := 1; /*numSegmento, cada video tem 4 segmentos*/
+DECLARE iC integer; /*idCoordenador*/
+        dHIS timestamp; /*dataHoraInicioSolicita*/
+        dHFS timestamp; /*dataHoraFimSolicita*/
+
+        numS integer := 1; /*numSegmento, cada video tem 4 segmentos*/
         d interval := '6 hours'; /*duracao*/
         dHI timestamp; /*dataHoraInicio*/
         dHIseg timestamp; /*dataHoraInicio do segmento*/
         dHF timestamp; /*dataHoraFim*/
         n integer; /*numCamara*/
+        m varchar(255); /*moradaLocal*/
         i integer := 0;
         times text[] :=
                 '{01-06-2018 00:00,02-06-2018 00:00,03-06-2018 00:00,04-06-2018 00:00,05-06-2018 00:00,
@@ -185,9 +186,14 @@ LOOP
     dHI := to_timestamp(times[i], 'DD-MM-YYYY HH24:MI');
     dHF := to_timestamp(times[i+1], 'DD-MM-YYYY HH24:MI');
     n := randomIntegerBetween(1, 100);
-
     INSERT INTO video
     VALUES(dHI, dHF, n);
+
+    iC := randomIntegerBetween(1, 100);
+    dHIS := random_timestamp();
+    dHFS := random_timestamp_after(dHIS);
+    INSERT INTO solicita
+    VALUES(iC, dHI, n, dHIS, dHFS);
 
     FOR numS IN 1..4
     LOOP
@@ -198,6 +204,30 @@ LOOP
     END LOOP;
 
 END LOOP;
+
+    INSERT INTO vigia
+    VALUES('Monchique', n);
+
+    FOR i IN (n+1)..100
+    LOOP
+
+        m := random_morada_local();
+
+        INSERT INTO vigia
+        VALUES(m, i); /*i corresponds to numCamara*/
+
+    END LOOP;
+
+    FOR i IN 1..(n-1)
+    LOOP
+
+        m := random_morada_local();
+
+        INSERT INTO vigia
+        VALUES(m, i); /*i corresponds to numCamara*/
+
+    END LOOP;
+
 END;
 $$ LANGUAGE plpgsql;
 
@@ -230,50 +260,18 @@ END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
-/*vigia*/
-CREATE OR REPLACE FUNCTION populate_vigia()
-RETURNS void AS
-$$
-DECLARE m varchar(255); /*moradaLocal*/
-        n integer; /*numCamara*/
-        i integer := 0;
-BEGIN
-
-n := randomIntegerBetween(1, 100);
-INSERT INTO vigia
-VALUES('Monchique', n);
-n := randomIntegerBetween(1, 100);
-INSERT INTO vigia
-VALUES('Oliveira do Hospital', n);
-
-FOR i IN 3..100
-LOOP
-
-    m := random_morada_local();
-    n := randomIntegerBetween(1, 100);
-
-    INSERT INTO vigia
-    VALUES(m, n);
-
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
 /*processoSocorro*/
 CREATE OR REPLACE FUNCTION populate_processo_socorro()
 RETURNS void AS
 $$
-DECLARE n integer; /*numProcessoSocorro*/
-        i integer := 0;
+DECLARE i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
 LOOP
 
-    n := randomIntegerBetween(1, 100);
-
     INSERT INTO processoSocorro
-    VALUES(n);
+    VALUES(i); /*i corresponds to numProcessoSocorro*/
 
 END LOOP;
 END;
@@ -295,7 +293,7 @@ FOR i IN 1..100
 LOOP
 
     numT := random_numeric_string(9);
-    iC := '00:00';
+    iC := random_timestamp();
     nP := random_nome_Pessoa();
     mL := random_morada_local();
     numP := randomIntegerBetween(1,100);
@@ -327,137 +325,98 @@ END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
-/*meio*/
-CREATE OR REPLACE FUNCTION populate_meio()
+/*meio, meioCombate, meioApoio, alocado, meioSocorro, transporta, acciona, audita*/
+CREATE OR REPLACE FUNCTION populate_meios()
 RETURNS void AS
 $$
-DECLARE numM integer; /*numMeio*/
+DECLARE iC integer; /*idCoordenador*/
+        dhI timestamp; /*datahoraInicio*/
+        dhF timestamp; /*datahoraFim*/
+        dA date; /*dataAuditoria*/
+        t text; /*texto*/
+
         nM varchar(80); /*nomeMeio*/
-        nE varchar(200); /*nomeEntidade*/
-        i integer := 0;
-BEGIN
-/*loops 100*/
-FOR i IN 1..100
-LOOP
 
-    numM := randomIntegerBetween(1, 100);
-    nM := random_string(10);
-    nE := random_nome_entidade();
+        numMC integer; /*numMeioCombate*/
 
-    INSERT INTO meio
-    VALUES(numM, nM, nE);
+        numMA integer; /*numMeioApoio*/
+        numH integer; /*numHoras*/
 
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
-/*meioCombate*/
-CREATE OR REPLACE FUNCTION populate_meio_combate()
-RETURNS void AS
-$$
-DECLARE numM integer; /*numMeio*/
-        nE varchar(200); /*nomeEntidade*/
-        i integer := 0;
-BEGIN
-/*loops 100*/
-FOR i IN 1..100
-LOOP
-
-    numM := randomIntegerBetween(1, 100);
-    nE := random_numeric_string(200);
-
-    INSERT INTO meioCombate
-    VALUES(numM, nE);
-
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
-/*meioApoio*/
-/*insert into meioApoio values ('Iacocca',	'L-17');
-insert into meioApoio values ('Brown',	'L-23');
-insert into meioApoio values ('Cook',	'L-15');
-insert into meioApoio values ('Nguyen',	'L-14');
-insert into meioApoio values ('Davis',	'L-93');*/
-
-/*meioSocorro*/
-/*insert into meioSocorro values ('Iacocca',	'L-17');
-insert into meioSocorro values ('Brown',	'L-23');
-insert into meioSocorro values ('Cook',	'L-15');
-insert into meioSocorro values ('Nguyen',	'L-14');
-insert into meioSocorro values ('Davis',	'L-93');*/
-
-/*transporta*/
-CREATE OR REPLACE FUNCTION populate_transporta()
-RETURNS void AS
-$$
-DECLARE numM integer; /*numMeio*/
-        nE varchar(200); /*nomeMeio*/
+        numMS integer; /*numMeioSocorro*/
         numV integer; /*numVitimas*/
+
         numP integer; /*numProcessoSocorro*/
+        nE varchar(200); /*nomeEntidade*/
         i integer := 0;
 BEGIN
-/*loops 100*/
+/*loops entities*/
 FOR i IN 1..100
 LOOP
 
-    numM := randomIntegerBetween(1, 100);
-    nE := random_numeric_string(200);
-    numV := randomIntegerBetween(0, 1000);
+    nE := 'Bombeiros' || i::text;
+
+    numMC := randomIntegerBetween(1, 100);
+    nM := random_string(10);
+    INSERT INTO meio
+    VALUES(numMC, nM, nE);
+    INSERT INTO meioCombate
+    VALUES(numMC, nE);
     numP := randomIntegerBetween(1, 100);
 
-    INSERT INTO transporta
-    VALUES(numM, nE, numV, numP);
+    IF (i<50) THEN INSERT INTO acciona VALUES(numMC, nE, numP);
+    END IF;
+    IF (i<34) THEN
+        iC := randomIntegerBetween(1,100);
+        dhI := random_timestamp();
+        dhF := random_timestamp_after(dhI);
+        dA := random_date();
+        t := random_string(20);
+        INSERT INTO audita VALUES(iC, numMC, nE, numP, dhI, dhF, dA, t);
+    END IF;
 
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
-/*alocado*/
-CREATE OR REPLACE FUNCTION populate_alocado()
-RETURNS void AS
-$$
-DECLARE numM integer; /*numMeio*/
-        nE varchar(200); /*nomeMeio*/
-        numH integer; /*numHoras*/
-        numP integer; /*numProcessoSocorro*/
-        i integer := 0;
-BEGIN
-/*loops 100*/
-FOR i IN 1..100
-LOOP
-
-    numM := randomIntegerBetween(1, 100);
-    nE := random_numeric_string(200);
+    numMA := randomIntegerBetween(101, 200);
+    nM := random_string(10);
+    INSERT INTO meio
+    VALUES(numMA, nM, nE);
+    INSERT INTO meioApoio
+    VALUES(numMA, nE);
     numH := randomIntegerBetween(0, 50);
     numP := randomIntegerBetween(1, 100);
-
     INSERT INTO alocado
-    VALUES(numM, nE, numH, numP);
+    VALUES(numMA, nE, numH, numP);
 
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
+    IF (i<50) THEN INSERT INTO acciona VALUES(numMA, nE, numP);
+    END IF;
+    IF (i<34) THEN
+        iC := randomIntegerBetween(1,100);
+        dhI := random_timestamp();
+        dhF := random_timestamp_after(dhI);
+        dA := random_date();
+        t := random_string(20);
+        INSERT INTO audita VALUES(iC, numMA, nE, numP, dhI, dhF, dA, t);
+    END IF;
 
-/*acciona*/
-CREATE OR REPLACE FUNCTION populate_acciona()
-RETURNS void AS
-$$
-DECLARE numM integer; /*numMeio*/
-        nE varchar(200); /*nomeMeio*/
-        numP integer; /*numProcessoSocorro*/
-        i integer := 0;
-BEGIN
-/*loops 100*/
-FOR i IN 1..100
-LOOP
-
-    numM := randomIntegerBetween(1, 100);
-    nE := random_numeric_string(200);
+    numMS := randomIntegerBetween(201, 300);
+    nM := random_string(10);
+    INSERT INTO meio
+    VALUES(numMS, nM, nE);
+    INSERT INTO meioSocorro
+    VALUES(numMS, nE);
+    numV := randomIntegerBetween(0, 1000);
     numP := randomIntegerBetween(1, 100);
+    INSERT INTO transporta
+    VALUES(numMS, nE, numV, numP);
 
-    INSERT INTO acciona
-    VALUES(numM, nE, numV, numP);
+    IF (i<50) THEN INSERT INTO acciona VALUES(numMS, nE, numP);
+    END IF;
+    IF (i<35) THEN
+        iC := randomIntegerBetween(1,100);
+        dhI := random_timestamp();
+        dhF := random_timestamp_after(dhI);
+        dA := random_date();
+        t := random_string(20);
+        INSERT INTO audita VALUES(iC, numMS, nE, numP, dhI, dhF, dA, t);
+    END IF;
 
 END LOOP;
 END;
@@ -467,51 +426,14 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION populate_coordenador()
 RETURNS void AS
 $$
-DECLARE iC integer; /*idCoordenador*/
-        i integer := 0;
+DECLARE i integer := 0;
 BEGIN
 /*loops 100*/
 FOR i IN 1..100
 LOOP
-
-    iC := randomIntegerBetween(1, 100);
 
     INSERT INTO coordenador
-    VALUES(iC);
-
-END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-
-/*audita*/
-CREATE OR REPLACE FUNCTION populate_audita()
-RETURNS void AS
-$$
-DECLARE iC integer; /*idCoordenador*/
-        numM integer; /*numMeio*/
-        nE varchar(200); /*nomeMeio*/
-        numP integer; /*numProcessoSocorro*/
-        dhI timestamp; /*datahoraInicio*/
-        dhF timestamp; /*datahoraFim*/
-        dA date; /*dataAuditoria*/
-        t text; /*texto*/
-        i integer := 0;
-BEGIN
-/*loops 100*/
-FOR i IN 1..100
-LOOP
-
-    iC := randomIntegerBetween(1, 100);
-    numM := randomIntegerBetween(1, 100);
-    nE := random_numeric_string(200);
-    numP := randomIntegerBetween(1, 100);
-    dhI := '00:00';
-    dhF := '00:00';
-    dA := '00:00';
-    t = random_numeric_string(100);
-
-    INSERT INTO audita
-    VALUES(iC, numM, nE, numP, dhI, dhF, dA, t);
+    VALUES(i);  /*i corresponds to idCoordenador*/
 
 END LOOP;
 END;
@@ -535,8 +457,8 @@ LOOP
     iC := randomIntegerBetween(1, 100);
     dHIV := '00:00';
     numC := randomIntegerBetween(1, 100);
-    dHI := '00:00';
-    dHF := '00:00';
+    dHI := random_timestamp();
+    dHF := random_timestamp_after(dHI);
 
     INSERT INTO solicita
     VALUES(iC, dHIV, numC, dHI, dHF);
@@ -547,20 +469,11 @@ $$ LANGUAGE plpgsql;
 
 DO $$ BEGIN
     PERFORM populate_camara();
-    PERFORM populate_video_segmento_video();
     PERFORM populate_local();
-    /*PERFORM populate_vigia();
-    PERFORM populate_evento_emergencia();
-    PERFORM populate_processo_socorro();
-    PERFORM populate_entidade_meio();
-    PERFORM populate_meio();
-    PERFORM populate_meio_combate();
-    PERFORM populate_meio_apoio();
-    PERFORM populate_meio_socorro();
-    PERFORM populate_transporta();
-    PERFORM populate_alocado();
-    PERFORM populate_acciona();
     PERFORM populate_coordenador();
-    PERFORM populate_audita();
-    PERFORM populate_solicita();*/
+    PERFORM populate_video_segmento_video_vigia_solicita();
+    PERFORM populate_processo_socorro();
+    PERFORM populate_evento_emergencia();
+    PERFORM populate_entidade_meio();
+    PERFORM populate_meios();
 END $$;

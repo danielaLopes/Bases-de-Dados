@@ -69,8 +69,8 @@ create table eventoEmergencia
       instanteChamada  timestamp not null,
       nomePessoa  varchar(80) not null,
       moradaLocal  varchar(255) not null,
-      numProcessoSocorro  integer, /*RI: pode ser null*/
-      unique(numTelefone, nomePessoa), /*ver restricao*/
+      numProcessoSocorro  integer not null,
+      unique(numTelefone, nomePessoa), /*restricao*/
       primary key(numTelefone, instanteChamada, moradaLocal, numProcessoSocorro),
       foreign key(moradaLocal)
           references local(moradaLocal) on delete cascade on update cascade,
@@ -162,8 +162,8 @@ create table audita
           references acciona(numMeio, nomeEntidade, numProcessoSocorro) on delete cascade on update cascade,
       /*RI: datahoraInicio < datahoraFim*/
       check (datahoraInicio < datahoraFim),
-      /*RI: dataAuditoria >= dataAtual*/
-      check (dataAuditoria >= current_date));
+      /*RI: dataAuditoria <= dataAtual*/
+      check (dataAuditoria <= current_date));
 
 create table solicita
      (idCoordenador	  integer	not null,
@@ -171,8 +171,8 @@ create table solicita
       numCamara   integer not null,
       dataHoraInicio   timestamp	not null,
       dataHoraFim   timestamp	not null,
-      primary key(idCoordenador, dataHoraInicio, numCamara),
+      primary key(idCoordenador, dataHoraInicioVideo, numCamara),
       foreign key(idCoordenador)
           references coordenador(idCoordenador) on delete cascade on update cascade,
-      foreign key(dataHoraInicio, numCamara)
+      foreign key(dataHoraInicioVideo, numCamara)
           references video(dataHoraInicio, numCamara) on delete cascade on update cascade);
