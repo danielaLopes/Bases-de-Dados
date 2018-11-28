@@ -1,4 +1,5 @@
-SELECT numprocessosocorro
+--QUERY 1
+/*SELECT DISTINCT numprocessosocorro
 FROM(
   SELECT numprocessosocorro, COUNT(*)
   FROM acciona
@@ -6,48 +7,46 @@ FROM(
   HAVING COUNT(*) >= all (
     SELECT COUNT(*)
     FROM acciona
-    GROUP BY numprocessosocorro)) as foo;
+    GROUP BY numprocessosocorro)) as foo;*/
 
+--QUERY 2
+/*SELECT nomeentidade
+FROM acciona NATURAL JOIN eventoemergencia
+WHERE instantechamada BETWEEN timestamp '2018-06-21 00:00:00' AND timestamp '2018-09-23 23:59:59'
+GROUP BY nomeentidade
+HAVING COUNT(nomeEntidade) >= ALL (
+  SELECT COUNT(nomeentidade)
+  FROM acciona NATURAL JOIN eventoemergencia
+  WHERE instantechamada BETWEEN timestamp '2018-06-21 00:00:00' AND timestamp '2018-09-23 23:59:59'
+  GROUP BY nomeentidade);*/
 
-SELECT nomeentidade
-FROM r NATURAL JOIN (
-  SELECT MAX(Count)
-  FROM (
-    SELECT nomeentidade, COUNT(*)
-    FROM acciona NATURAL JOIN (
-      SELECT *
-      FROM eventoemergencia
-      WHERE 21/06/2018 00:00 >= instantechamada >= 23/09/2018 23:59)
-      GROUP BY nomeentidade) as r) as Count)
+--QUERY 3
+/*SELECT numprocessosocorro
+FROM eventoemergencia NATURAL JOIN acciona
+WHERE moradalocal = 'Oliveira do Hospital' AND instantechamada BETWEEN timestamp '2018-01-01 00:00:00' AND timestamp '2018-12-31 23:59:59'
+EXCEPT
+SELECT numprocessosocorro
+FROM audita;*/
 
-
-SELECT numprocesso
-FROM (
-  SELECT *
-  FROM localincendio NATURAL JOIN(
-    SELECT *
-    FROM eventoemergencia NATURAL JOIN(
-      SELECT *
-      FROM acciona EXCEPT audita)
-    WHERE 01/01/2018 00:00 >= instantechamada >= 31/12/2018 23:59)
-  WHERE moradalocal = ‘Oliveira do Hospital’);
-
-
-SELECT numsegmento
+--QUERY 4
+/*SELECT COUNT(*)
 FROM (
   SELECT *
   FROM vigia NATURAL JOIN(
     SELECT *
     FROM segmentovideo
-    WHERE duracao > 60s and 01/08/2018 00:00 >= datahorainicio >= 31/08/2018)
-  WHERE moradalocal = ‘Monchique’)
+    WHERE duracao > interval '60s' AND datahorainicio BETWEEN timestamp '2018-08-01 00:00:00' AND timestamp '2018-08-31 23:59:59') as foo
+  WHERE moradalocal = 'Monchique') as foo2;*/
 
+--QUERY 5
+/*SELECT nummeio, nomeentidade
+FROM (acciona NATURAL JOIN meiocombate) AS f7
+EXCEPT
+SELECT *
+FROM meioapoio;*/
 
-SELECT nummeio, nomeentidade
-FROM (( acciona NATURAL JOIN meiocombate) EXCEPT meioapoio);
-
-
-SELECT nomeentidade
+--QUERY 6
+/*SELECT DISTINCT nomeentidade
 FROM acciona d
 WHERE NOT EXISTS(
   SELECT numprocessosocorro

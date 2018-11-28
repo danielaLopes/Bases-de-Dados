@@ -86,15 +86,6 @@ begin
 end;
 $$ language plpgsql;
 
-Create or replace function random_nome_entidade() returns text as
-$$
-declare
-  i integer := randomIntegerBetween(1,100);
-begin
-  return 'Bombeiros' || i::text;
-end;
-$$ language plpgsql;
-
 Create or replace function random_timestamp() returns timestamp as
 $$
 begin
@@ -242,8 +233,8 @@ RETURNS void AS
 $$
 DECLARE i integer := 0;
         locals text[] := '{Abrantes,Agueda,Alandroal,Albergaria-a-Velha,Albufeira,Alcanena,
-            Alcobaça,Alcochete,Alenquer,Alcoutim,Aljezur,Aljustrel,Almada,Almeida,Almeirim,
-            Almodovar,Alpiarça,Amadora,Alvaiazere,Alvito,Arouca,Aveiro,Amarante,
+            Alcobaca,Alcochete,Alenquer,Alcoutim,Aljezur,Aljustrel,Almada,Almeida,Almeirim,
+            Almodovar,Alpiarca,Amadora,Alvaiazere,Alvito,Arouca,Aveiro,Amarante,
             Amares,Anadia,Angra do Heroismo,Arcos de Valdevez,Arganil,Arraiolos,
             Avis,Arruda dos Vinhos,Azambuja,Barcelos,Barrancos,Barreiro,Batalha,Beja,
             Bombarral,Braga,Braganca,Benavente,Borba,Boticas,Cadaval,Castelo Branco,
@@ -307,6 +298,18 @@ LOOP
     VALUES(numT, iC, nP, mL, numP);
 
 END LOOP;
+
+FOR i IN 1..40
+LOOP
+
+  numT := random_numeric_string(9);
+  iC := random_timestamp();
+  nP := random_nome_Pessoa();
+  numP := randomIntegerBetween(1,10);
+  INSERT INTO eventoEmergencia
+  VALUES(numT, iC, nP, 'Oliveira do Hospital', numP);
+
+END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -327,6 +330,8 @@ LOOP
     VALUES(n);
 
 END LOOP;
+INSERT INTO entidadeMeio
+VALUES('Bombeiros101');
 END;
 $$ LANGUAGE plpgsql;
 
@@ -366,10 +371,22 @@ LOOP
     VALUES(numMC, nM, nE);
     INSERT INTO meioCombate
     VALUES(numMC, nE);
+
+    INSERT INTO meio
+    VALUES(300 + i, nM,'Bombeiros101');
+    INSERT INTO meioCombate
+    VALUES(300 + i, 'Bombeiros101');
+
     numP := randomIntegerBetween(1, 100);
+
+    IF (i<10) THEN INSERT INTO meioApoio VALUES(numMC, nE);
+    END IF;
 
     IF (i<50) THEN INSERT INTO acciona VALUES(numMC, nE, numP);
     END IF;
+
+    INSERT INTO acciona VALUES(300 + i, 'Bombeiros101', numP);
+
     IF (i<34) THEN
         iC := randomIntegerBetween(1,100);
         dhI := random_timestamp();
@@ -382,6 +399,10 @@ LOOP
     numMA := randomIntegerBetween(101, 200);
     nM := random_string(10);
     INSERT INTO meio
+    VALUES(400 + i, nM,'Bombeiros101');
+    INSERT INTO meioCombate
+    VALUES(400 + i, 'Bombeiros101');
+    INSERT INTO meio
     VALUES(numMA, nM, nE);
     INSERT INTO meioApoio
     VALUES(numMA, nE);
@@ -392,6 +413,9 @@ LOOP
 
     IF (i<50) THEN INSERT INTO acciona VALUES(numMA, nE, numP);
     END IF;
+
+    INSERT INTO acciona VALUES(400 + i, 'Bombeiros101', numP);
+
     IF (i<34) THEN
         iC := randomIntegerBetween(1,100);
         dhI := random_timestamp();
@@ -407,6 +431,10 @@ LOOP
     VALUES(numMS, nM, nE);
     INSERT INTO meioSocorro
     VALUES(numMS, nE);
+    INSERT INTO meio
+    VALUES(500 + i, nM,'Bombeiros101');
+    INSERT INTO meioCombate
+    VALUES(500 + i, 'Bombeiros101');
     numV := randomIntegerBetween(0, 1000);
     numP := randomIntegerBetween(1, 100);
     INSERT INTO transporta
@@ -414,6 +442,9 @@ LOOP
 
     IF (i<50) THEN INSERT INTO acciona VALUES(numMS, nE, numP);
     END IF;
+
+    INSERT INTO acciona VALUES(500 + i, 'Bombeiros101', numP);
+
     IF (i<35) THEN
         iC := randomIntegerBetween(1,100);
         dhI := random_timestamp();

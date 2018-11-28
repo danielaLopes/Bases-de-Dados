@@ -21,13 +21,13 @@ drop table if exists solicita cascade;
 ----------------------------------------
 create table camara
    (numCamara 	integer	not null,
-   primary key(numCamara) on delete cascade on update cascade);
+   primary key(numCamara));
 
 create table video
     (dataHoraInicio 	timestamp	not null,
     dataHoraFim   timestamp  not null,
     numCamara   integer not null,
-    primary key(dataHoraInicio, numCamara) on delete cascade on update cascade,
+    primary key(dataHoraInicio, numCamara),
     foreign key(numCamara)
         references camara(numCamara) on delete cascade on update cascade);
 
@@ -38,7 +38,7 @@ create table segmentoVideo
      numCamara   integer not null,
      primary key(numSegmento, dataHoraInicio, numCamara),
      foreign key(dataHoraInicio, numCamara)
-        references video(dataHoraInicio, numCamara));
+        references video(dataHoraInicio, numCamara) on delete cascade on update cascade);
 
 create table local
     (moradaLocal 	varchar(255)	not null,
@@ -66,13 +66,13 @@ create table eventoEmergencia
       unique(numTelefone, nomePessoa), /*restricao*/
       primary key(numTelefone, instanteChamada, moradaLocal, numProcessoSocorro),
       foreign key(moradaLocal)
-          references local(moradaLocal) on delete cascade on update cascade,
+          references local(moradaLocal),
       foreign key(numProcessoSocorro)
-          references processoSocorro(numProcessoSocorro) on delete cascade on update cascade);
+          references processoSocorro(numProcessoSocorro));
 
 create table entidadeMeio
      (nomeEntidade	varchar(200)	not null,
-      primary key(nomeEntidade) on delete cascade on update cascade);
+      primary key(nomeEntidade));
 
 create table meio
      (numMeio	  integer	not null,
@@ -80,7 +80,7 @@ create table meio
       nomeEntidade  varchar(200)	not null,
       primary key(numMeio, nomeEntidade),
       foreign key(nomeEntidade)
-          references entidadeMeio(nomeEntidade));
+          references entidadeMeio(nomeEntidade) on delete cascade on update cascade);
 
 create table meioCombate
      (numMeio	  integer	not null,
@@ -168,7 +168,7 @@ create table solicita
       foreign key(idCoordenador)
           references coordenador(idCoordenador),
       foreign key(dataHoraInicioVideo, numCamara)
-          references video(dataHoraInicio, numCamara);
+          references video(dataHoraInicio, numCamara),
       check (datahoraInicio < datahoraFim),
       check (dataHoraInicioVideo <= datahoraInicio),
       check (dataHoraInicioVideo <= current_date));

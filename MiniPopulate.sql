@@ -69,7 +69,7 @@ declare
       Tavira,Tomar,Tondela,Viseu}';
   i integer;
 begin
-  i := randomIntegerBetween(1,array_length(locals,1));
+  i := randomIntegerBetween(1,10);
   return locals[i];
 end;
 $$ language plpgsql;
@@ -83,15 +83,6 @@ declare
   i integer := randomIntegerBetween(1,array_length(names,1));
 begin
   return names[i];
-end;
-$$ language plpgsql;
-
-Create or replace function random_nome_entidade() returns text as
-$$
-declare
-  i integer := randomIntegerBetween(1,100);
-begin
-  return 'Bombeiros' || i::text;
 end;
 $$ language plpgsql;
 
@@ -163,19 +154,7 @@ DECLARE iC integer; /*idCoordenador*/
         m varchar(255); /*moradaLocal*/
         i integer := 0;
         times text[] :=
-                '{01-06-2018 00:00,02-06-2018 00:00,03-06-2018 00:00,04-06-2018 00:00,05-06-2018 00:00,
-                06-06-2018 00:00,07-06-2018 00:00,08-06-2018 00:00,09-06-2018 00:00,10-06-2018 00:00,11-06-2018 00:00,
-                12-06-2018 00:00,13-06-2018 00:00,14-06-2018 00:00,15-06-2018 00:00,16-06-2018 00:00,17-06-2018 00:00,
-                18-06-2018 00:00,19-06-2018 00:00,20-06-2018 00:00,21-06-2018 00:00,22-06-2018 00:00,23-06-2018 00:00,
-                24-06-2018 00:00,25-06-2018 00:00,26-06-2018 00:00,27-06-2018 00:00,28-06-2018 00:00,29-06-2018 00:00,
-                30-06-2018 00:00,
-                01-07-2018 00:00,02-07-2018 00:00,03-07-2018 00:00,04-07-2018 00:00,05-07-2018 00:00,
-                06-07-2018 00:00,07-07-2018 00:00,08-07-2018 00:00,09-07-2018 00:00,10-07-2018 00:00,11-07-2018 00:00,
-                12-07-2018 00:00,13-07-2018 00:00,14-07-2018 00:00,15-07-2018 00:00,16-07-2018 00:00,17-07-2018 00:00,
-                18-07-2018 00:00,19-07-2018 00:00,20-07-2018 00:00,21-07-2018 00:00,22-07-2018 00:00,23-07-2018 00:00,
-                24-07-2018 00:00,25-07-2018 00:00,26-07-2018 00:00,27-07-2018 00:00,28-07-2018 00:00,29-07-2018 00:00,
-                30-07-2018 00:00,31-07-2018 00:00,
-                01-08-2018 00:00,02-08-2018 00:00,03-08-2018 00:00,04-08-2018 00:00,05-08-2018 00:00,
+                '{01-08-2018 00:00,02-08-2018 00:00,03-08-2018 00:00,04-08-2018 00:00,05-08-2018 00:00,
                 06-08-2018 00:00,07-08-2018 00:00,08-08-2018 00:00,09-08-2018 00:00,10-08-2018 00:00,11-08-2018 00:00,
                 12-08-2018 00:00,13-08-2018 00:00,14-08-2018 00:00,15-08-2018 00:00,16-08-2018 00:00,17-08-2018 00:00,
                 18-08-2018 00:00,19-08-2018 00:00,20-08-2018 00:00,21-08-2018 00:00,22-08-2018 00:00,23-08-2018 00:00,
@@ -242,8 +221,8 @@ RETURNS void AS
 $$
 DECLARE i integer := 0;
         locals text[] := '{Abrantes,Agueda,Alandroal,Albergaria-a-Velha,Albufeira,Alcanena,
-            Alcobaça,Alcochete,Alenquer,Alcoutim,Aljezur,Aljustrel,Almada,Almeida,Almeirim,
-            Almodovar,Alpiarça,Amadora,Alvaiazere,Alvito,Arouca,Aveiro,Amarante,
+            Alcobaca,Alcochete,Alenquer,Alcoutim,Aljezur,Aljustrel,Almada,Almeida,Almeirim,
+            Almodovar,Alpiarca,Amadora,Alvaiazere,Alvito,Arouca,Aveiro,Amarante,
             Amares,Anadia,Angra do Heroismo,Arcos de Valdevez,Arganil,Arraiolos,
             Avis,Arruda dos Vinhos,Azambuja,Barcelos,Barrancos,Barreiro,Batalha,Beja,
             Bombarral,Braga,Braganca,Benavente,Borba,Boticas,Cadaval,Castelo Branco,
@@ -262,6 +241,10 @@ LOOP
     INSERT INTO local
     VALUES(locals[i]); /*moradaLocal*/
 END LOOP;
+INSERT INTO local
+VALUES('Monchique');
+INSERT INTO local
+VALUES('Oliveira do Hospital');
 END;
 $$ LANGUAGE plpgsql;
 
@@ -301,12 +284,20 @@ LOOP
     iC := random_timestamp();
     nP := random_nome_Pessoa();
     mL := random_morada_local();
-    numP := randomIntegerBetween(1,100);
+    numP := randomIntegerBetween(1,10);
 
     INSERT INTO eventoEmergencia
     VALUES(numT, iC, nP, mL, numP);
 
 END LOOP;
+
+numT := random_numeric_string(9);
+iC := random_timestamp();
+nP := random_nome_Pessoa();
+numP := randomIntegerBetween(1,10);
+INSERT INTO eventoEmergencia
+VALUES(numT, iC, nP, 'Oliveira do Hospital', numP);
+
 END;
 $$ LANGUAGE plpgsql;
 
@@ -327,6 +318,8 @@ LOOP
     VALUES(n);
 
 END LOOP;
+INSERT INTO entidadeMeio
+VALUES('Bombeiros101');
 END;
 $$ LANGUAGE plpgsql;
 
@@ -366,11 +359,21 @@ LOOP
     VALUES(numMC, nM, nE);
     INSERT INTO meioCombate
     VALUES(numMC, nE);
+    INSERT INTO meio
+    VALUES(30 + i, nM,'Bombeiros101');
+    INSERT INTO meioCombate
+    VALUES(30 + i, 'Bombeiros101');
+
+    IF (i<3) THEN INSERT INTO meioApoio VALUES(numMC, nE);
+    END IF;
     numP := randomIntegerBetween(1, 10);
 
     IF (i<5) THEN INSERT INTO acciona VALUES(numMC, nE, numP);
     END IF;
-    IF (i<3) THEN
+
+    INSERT INTO acciona VALUES(30 + i, 'Bombeiros101', numP);
+
+    IF (i<2) THEN
         iC := randomIntegerBetween(1,10);
         dhI := random_timestamp();
         dhF := random_timestamp_after(dhI);
@@ -382,6 +385,10 @@ LOOP
     numMA := randomIntegerBetween(11, 20);
     nM := random_string(10);
     INSERT INTO meio
+    VALUES(40 + i, nM,'Bombeiros101');
+    INSERT INTO meioCombate
+    VALUES(40 + i, 'Bombeiros101');
+    INSERT INTO meio
     VALUES(numMA, nM, nE);
     INSERT INTO meioApoio
     VALUES(numMA, nE);
@@ -390,9 +397,12 @@ LOOP
     INSERT INTO alocado
     VALUES(numMA, nE, numH, numP);
 
-    IF (i<50) THEN INSERT INTO acciona VALUES(numMA, nE, numP);
+    IF (i<5) THEN INSERT INTO acciona VALUES(numMA, nE, numP);
     END IF;
-    IF (i<34) THEN
+
+    INSERT INTO acciona VALUES(40 + i, 'Bombeiros101', numP);
+
+    IF (i<2) THEN
         iC := randomIntegerBetween(1,10);
         dhI := random_timestamp();
         dhF := random_timestamp_after(dhI);
@@ -407,6 +417,10 @@ LOOP
     VALUES(numMS, nM, nE);
     INSERT INTO meioSocorro
     VALUES(numMS, nE);
+    INSERT INTO meio
+    VALUES(50 + i, nM,'Bombeiros101');
+    INSERT INTO meioCombate
+    VALUES(50 + i, 'Bombeiros101');
     numV := randomIntegerBetween(0, 1000);
     numP := randomIntegerBetween(1, 10);
     INSERT INTO transporta
@@ -414,7 +428,10 @@ LOOP
 
     IF (i<5) THEN INSERT INTO acciona VALUES(numMS, nE, numP);
     END IF;
-    IF (i<3) THEN
+
+    INSERT INTO acciona VALUES(50 + i, 'Bombeiros101', numP);
+
+    IF (i<2) THEN
         iC := randomIntegerBetween(1,10);
         dhI := random_timestamp();
         dhF := random_timestamp_after(dhI);
