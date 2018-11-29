@@ -17,13 +17,23 @@
 
         $db->beginTransaction();
 
-        $sql = "INSERT INTO eventoemergencia VALUES(:numtelefone,:instantechamada,:nomepessoa,:moradalocal,:numprocessosocorro);";
+        $sql1 = "SELECT numprocessosocorro FROM eventoemergencia WHERE numprocessosocorro = :numprocessosocorro;";
+        $sql2 = "INSERT INTO processosocorro VALUES(:numprocessosocorro);";
+        $sql3 = "INSERT INTO eventoemergencia VALUES(:numtelefone,:instantechamada,:nomepessoa,:moradalocal,:numprocessosocorro);";
 
-        $result = $db->prepare($sql);
-        $result->execute(array($numtelefone,$instantechamada,$nomepessoa,$moradalocal,$numprocessosocorro));
+        $result1 = $db->prepare($sql1);
+        $result1->execute(array($numprocessosocorro));
+
+        if ($result1->rowCount() == 0){
+          $result2 = $db->prepare($sql2);
+          $result2->execute(array($numprocessosocorro));
+        }
+
+        $result3 = $db->prepare($sql3);
+        $result3->execute(array($numtelefone,$instantechamada,$nomepessoa,$moradalocal,$numprocessosocorro));
 
         $db->commit();
-        
+
         echo("<p>O Evento de Emergencia foi inserido\n</p><p>Numero de telefone: {$numtelefone}\n</p><p>Instante de Chamada: {$instantechamada}</p>");
         $db = null;
     }

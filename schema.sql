@@ -80,28 +80,28 @@ create table meio
       nomeEntidade  varchar(200)	not null,
       primary key(numMeio, nomeEntidade),
       foreign key(nomeEntidade)
-          references entidadeMeio(nomeEntidade) on delete cascade on update cascade);
+          references entidadeMeio(nomeEntidade));
 
 create table meioCombate
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
       primary key(numMeio, nomeEntidade),
       foreign key(numMeio, nomeEntidade)
-          references meio(numMeio, nomeEntidade));
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade);
 
 create table meioApoio
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
       primary key(numMeio, nomeEntidade),
       foreign key(numMeio, nomeEntidade)
-          references meio(numMeio, nomeEntidade));
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade);
 
 create table meioSocorro
      (numMeio	  integer	not null,
       nomeEntidade	varchar(200)	not null,
       primary key(numMeio, nomeEntidade),
       foreign key(numMeio, nomeEntidade)
-          references meio(numMeio, nomeEntidade));
+          references meio(numMeio, nomeEntidade) on delete cascade on update cascade);
 
 create table transporta
      (numMeio	  integer	not null,

@@ -17,18 +17,10 @@
 
         $db->beginTransaction();
 
-        $sql1 = "DELETE FROM $table WHERE nummeio =:oldnummeio AND nomeentidade = :oldnomeentidade ;";
-        $sql2 = "UPDATE meio SET nummeio = :newnummeio, nomeentidade = :newnomeentidade WHERE (nummeio = :oldnummeio and nomeentidade = :oldnomeentidade);";
-        $sql3 = "INSERT INTO $table VALUES(:newnummeio,:newnomeentidade);";
+        $sql1 = "UPDATE meio SET nummeio = :newnummeio, nomeentidade = :newnomeentidade WHERE (nummeio = :oldnummeio and nomeentidade = :oldnomeentidade);";
 
         $result1 = $db->prepare($sql1);
-        $result1->execute(array($oldnummeio, $oldnomeentidade));
-
-        $result2 = $db->prepare($sql2);
-        $result2->execute(array($newnummeio, $newnomeentidade, $oldnummeio, $oldnomeentidade));
-
-        $result3 = $db->prepare($sql3);
-        $result3->execute(array($newnummeio, $newnomeentidade));
+        $result1->execute(array($newnummeio, $newnomeentidade, $oldnummeio, $oldnomeentidade));
 
         $db->commit();
 
